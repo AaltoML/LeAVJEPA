@@ -327,7 +327,7 @@
         <p>Audio becomes a log-mel spectrogram; video becomes tubelets. Two joint global views and two modality-specific local views pass through one transformer and projector. Alignment brings their embeddings together; SIGReg prevents collapse across the batch.</p>
         <p>Enable JavaScript to explore the method animation.</p>
       </div>
-      <figcaption><b>The AV&#8209;JEPA training pipeline.</b> Follow one guitar performance from frames and sound to a shared representation. Drag the timeline to revisit any stage. Source frames and audio are real; token sequences and latent geometry are illustrative.</figcaption>
+      <figcaption><b>AV&#8209;JEPA connects sound and vision by dropping a modality.</b> One shared encoder aligns audio-only and video-only views with joint audio-video views. MSE brings embeddings together; SIGReg prevents collapse, without a teacher, predictor, or contrastive negatives. Latent geometry is illustrative.</figcaption>
     </figure>
   </section>
 

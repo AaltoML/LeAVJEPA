@@ -6,13 +6,13 @@
   const asset = "assets/method/", A = "#e11d48", V = "#3b82f6", R = "#059669", ink = "#18181b";
   const duration = 18000;
   const stages = [
-    [0, "Source", "One guitar performance: video frames and an audio waveform."],
-    [2500, "Patches", "Video patches extend back through time; neighboring frame pairs form tubelets. Audio patches cover time and frequency."],
-    [4000, "Views", "Two globals keep both modalities. Each local drops one; the remaining patches become tokens."],
-    [8000, "Encoder", "Each view passes through repeated attention and MLP blocks. Its [CLS] output goes through the projector to become an embedding."],
-    [10500, "Alignment", "For each clip, align its views to the mean of its two global embeddings."],
-    [13000, "SIGReg", "For each view, project the batch onto random directions. SIGReg encourages these projected distributions to follow a standard Gaussian."],
-    [16000, "Update", "Alignment and SIGReg jointly train the shared transformer and projector. Repeat with the next batch."],
+    [0, "Source"],
+    [2500, "Patches"],
+    [4000, "Views"],
+    [8000, "Encoder"],
+    [10500, "Alignment"],
+    [13000, "SIGReg"],
+    [16000, "Update"],
   ];
   // Markers land on readable states; the continuous slider still covers every frame.
   const stops = [0, 3500, 7000, 9600, 12300, 15000, duration];
@@ -45,15 +45,13 @@
     return [.72*r*Math.cos(angle)+.45, 1.2*r*Math.sin(angle)-.25];
   });
   root.innerHTML = `
-    <div class="ma-toolbar"><span class="small-label">One clip → the complete method</span><div class="ma-controls"><button id="ma-toggle" type="button">Pause</button><button id="ma-replay" type="button" aria-label="Replay method animation">↺ Replay</button></div></div>
     <div class="ma-timeline">
-      <div class="ma-timeline-label"><label for="ma-scrubber">Drag to explore</label><output id="ma-time" for="ma-scrubber">0:00 / 0:18</output></div>
+      <div class="ma-playback"><button id="ma-toggle" type="button" aria-label="Pause animation"><svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path id="ma-play-icon" d="M4 2H6V14H4ZM10 2H12V14H10Z"/></svg></button><output id="ma-time" for="ma-scrubber">0:00 / 0:18</output></div>
       <input id="ma-scrubber" type="range" min="0" max="${duration}" step="any" value="0" aria-label="Method animation timeline">
       <div class="ma-marks" role="group" aria-label="Jump to a point in the animation">
         ${stages.map(([, name], i) => `<button type="button" data-time="${stops[i]}" data-phase="${i}" style="--position:${stops[i]/duration*100}%" aria-label="Go to ${name.toLowerCase()}, ${stops[i]/1000} seconds"><i aria-hidden="true"></i><span>${name === "Alignment" ? "Align" : name === "Encoder" ? "Model" : name}</span></button>`).join("")}
       </div>
     </div>
-    <div class="ma-caption"><p id="ma-explanation"></p></div>
     <svg class="ma-canvas" viewBox="0 0 1220 570" role="img" aria-labelledby="ma-title ma-desc">
       <title id="ma-title">The complete AV-JEPA method, built from one guitar sample</title>
       <desc id="ma-desc">Frames and the spectrogram separate into patches. Two global views retain both modalities; two locals retain only audio or video. Each sequence starts with a labeled CLS token. A shared transformer repeats attention and MLP blocks, then its CLS output passes through the projector. Three stacked frames reveal temporal depth, with matching patches extending backward. Tubelets group patches from neighboring frame pairs. In the latent space, alignment brings views of one clip together. SIGReg compares characteristic functions of projected batches with the Gaussian target. The weighted losses update the shared encoder and projector.</desc>
@@ -67,7 +65,7 @@
       </defs>
       <g id="ma-connections" stroke="#a1a1aa" stroke-width="1.3" marker-end="url(#ma-arrow)"></g>
       <g id="ma-video">
-        ${text(0,-23,"Video",'id="ma-video-label" class="ma-kicker" fill="'+V+'"')}
+        ${text(96,-23,"Video",'id="ma-video-label" text-anchor="middle" class="ma-kicker" fill="'+V+'"')}
         ${[2,1,0].map(i=>`<g id="ma-frame-${i}" transform="translate(${i*12} ${28-i*14})" opacity="${1-i*.23}">
           ${rect(0,0,168,168,"white")}
           <g class="ma-frame-sheet"><use href="#ma-frame-source-${i}"/></g>
@@ -87,7 +85,7 @@
         </g>
       </g>
       <g id="ma-audio">
-        ${text(0,-23,"Waveform",'id="ma-audio-label" class="ma-kicker" fill="'+A+'"')}
+        ${text(90,-23,"Waveform",'id="ma-audio-label" text-anchor="middle" class="ma-kicker"')}
         ${rect(0,0,180,90,"#fff1f2")}
         <g id="ma-wave">${image("guitar-wave.svg",0,12,180,66)}</g>
         <g id="ma-audio-sheet" clip-path="url(#ma-mel-clip)">${image("guitar-mel.png",0,0,180,90)}</g>
@@ -98,20 +96,20 @@
 
       </g>
       <g id="ma-views">
-        ${text(0,-26,"Views → tokens",'class="ma-kicker"')}
+        ${text(110,-26,"Views → tokens",'text-anchor="middle" class="ma-kicker"')}
         ${views.map((view,i)=>`<g id="ma-view-${i}" transform="translate(0 ${rowY(i)})">
           ${rect(0,0,220,62,"#ffffff",'stroke="#e4e4e7"')}${text(12,18,view.name,'class="ma-view-name"')}
           ${rect(10,29,46,23,"#eff6ff",'stroke="#bfdbfe"')}${text(33,45,"[CLS]",'text-anchor="middle" class="ma-cls-label"')}
           <g id="ma-row-${i}-video" class="ma-video-tokens">${tokenStrip("video",68)}</g>
-          <g id="ma-row-${i}-audio" class="ma-audio-tokens">${tokenStrip("audio",150)}</g>
+          <g id="ma-row-${i}-audio" class="ma-audio-tokens">${tokenStrip("audio",128)}</g>
           ${!view.video ? `<g id="ma-drop-${i}">${rect(68,31,57,19,"#fafafa",'stroke="#d4d4d8" stroke-dasharray="3 3"')}${path("M91 36L101 45M101 36L91 45",'stroke="#d4d4d8"')}</g>` : ""}
-          ${!view.audio ? `<g id="ma-drop-${i}">${rect(150,31,57,19,"#fafafa",'stroke="#d4d4d8" stroke-dasharray="3 3"')}${path("M173 36L183 45M183 36L173 45",'stroke="#d4d4d8"')}</g>` : ""}
+          ${!view.audio ? `<g id="ma-drop-${i}">${rect(128,31,57,19,"#fafafa",'stroke="#d4d4d8" stroke-dasharray="3 3"')}${path("M151 36L161 45M161 36L151 45",'stroke="#d4d4d8"')}</g>` : ""}
         </g>`).join("")}
 
 
       </g>
       <g id="ma-model">
-        ${text(0,-29,"Shared transformer",'class="ma-kicker"')}
+        ${text(85,-29,"Vision Transformer",'id="ma-model-title" text-anchor="middle" class="ma-kicker"')}
         ${rect(8,-8,170,100,"#fafafa",'stroke="#e4e4e7"')}${rect(4,-4,170,100,"#fafafa",'stroke="#d4d4d8"')}
         ${rect(0,0,170,100,"#fafafa",'stroke="#a1a1aa"')}
         <g id="ma-model-pulse">${rect(1,1,168,98,"#1d4ed80c",'stroke="#3b82f6"')}</g>
@@ -119,14 +117,14 @@
         ${path("M85 43V55",'stroke="#a1a1aa" marker-end="url(#ma-arrow)"')}
         ${rect(14,57,142,33,"white",'stroke="#d4d4d8"')}${text(85,79,"MLP",'text-anchor="middle" class="ma-block-label"')}
         <g id="ma-readout">
-          ${path("M85 100V105M85 129V137",'stroke="#a1a1aa" marker-end="url(#ma-arrow)"')}
-          ${rect(60,105,50,24,"#eff6ff",'stroke="#bfdbfe"')}${text(85,122,"[CLS]",'text-anchor="middle" class="ma-cls-label"')}
+          ${path("M85 100V121M85 147V175",'stroke="#a1a1aa" marker-end="url(#ma-arrow)"')}
+          ${rect(60,122,50,24,"#eff6ff",'stroke="#bfdbfe"')}${text(85,139,"[CLS]",'text-anchor="middle" class="ma-cls-label"')}
         </g>
-        ${rect(0,138,170,46,"white",'stroke="#a1a1aa"')}<g id="ma-projector-pulse">${rect(1,139,168,44,"#eff6ff",'stroke="#93c5fd"')}</g>${text(85,166,"Projector",'text-anchor="middle"')}
+        ${rect(0,176,170,46,"white",'stroke="#a1a1aa"')}<g id="ma-projector-pulse">${rect(1,177,168,44,"#eff6ff",'stroke="#93c5fd"')}</g>${text(85,204,"Projector",'text-anchor="middle"')}
 
       </g>
       <g id="ma-embeddings">
-        ${text(0,-31,"Embeddings",'class="ma-kicker"')}
+        ${text(125,-31,"Embeddings",'text-anchor="middle" class="ma-kicker"')}
 
         ${rect(0,0,250,260,"#ffffff",'stroke="#e4e4e7"')}
         ${path("M20 15V215H232",'stroke="#f4f4f5" stroke-width="1"')}
@@ -142,7 +140,7 @@
         <g id="ma-align-points"></g>
       </g>
       <g id="ma-distribution">
-        ${text(0,-31,"SIGReg",'class="ma-kicker"')}
+        ${text(90,-31,"SIGReg",'text-anchor="middle" class="ma-kicker"')}
         ${text(90,-5,"Random projections",'text-anchor="middle" class="ma-prominent"')}
         ${path("M0 30H180",'stroke="#d1fae5"')}
         <g id="ma-projection-samples"></g>
@@ -175,13 +173,13 @@
   const point = (id,x,y) => { const [px,py,s]=positions[id]; return [px+x*s,py+y*s]; };
   function layout() {
     const small = mobile.matches;
-    root.querySelector("svg.ma-canvas").setAttribute("viewBox", small ? "0 0 370 1630" : "0 0 1220 495");
+    root.querySelector("svg.ma-canvas").setAttribute("viewBox", small ? "0 0 370 1670" : "0 0 1260 480");
     positions = small ? {
       video: [21,49,.8], audio: [207,96,.78], views: [74,334,1], model: [100,756,1],
-      embeddings: [60,1040,1], distribution: [95,1380,1],
+      embeddings: [60,1080,1], distribution: [95,1420,1],
     } : {
-      video: [24,76,.82], audio: [24,338,.82], views: [218,102,.92], model: [482,175,.9],
-      embeddings: [688,192,1], distribution: [999,202,1],
+      video: [24,76,.82], audio: [24,338,.82], views: [254,110,.92], model: [512,140,.9],
+      embeddings: [718,110,1], distribution: [1034,132,1],
     };
     Object.entries(positions).forEach(([id,[x,y,scale]]) => get(id).setAttribute("transform",`translate(${x} ${y}) scale(${scale})`));
     const specs = [];
@@ -195,23 +193,23 @@
         const [x,y] = point("views",220,rowY(i)+40);
         add(`encode-${i}`,`M${x+2} ${y}H326V686H185V700`,7400+i*180,8150+i*180);
       });
-      add("model-out","M185 942V990",8900,10000);
-      add("distribution","M185 1302V1320",13000,14000);
+      add("model-out","M185 980V1030",8900,10000);
+      add("distribution","M185 1342V1360",13000,14000);
     } else {
       // Every data edge moves forward along x; no return path for the losses.
       const [vx,vy] = point("video",194,98), [ax,ay] = point("audio",181,45);
-      add("source-video",`M${vx+2} ${vy}H197`,3500,4300,false);
-      add("source-audio",`M${ax+2} ${ay}H197`,3500,4300,false);
-      add("source-join",`M197 ${Math.min(vy,point("views",0,40)[1])}V${ay}`,3500,4500,false);
+      add("source-video",`M${vx+2} ${vy}H214`,3500,4300,false);
+      add("source-audio",`M${ax+2} ${ay}H214`,3500,4300,false);
+      add("source-join",`M214 ${Math.min(vy,point("views",0,40)[1])}V${ay}`,3500,4500,false);
       views.forEach((_,i) => {
         const [x,y] = point("views",0,rowY(i)+40);
-        add(`view-in-${i}`,`M197 ${y}H${x-7}`,4100+i*180,4700+i*180);
+        add(`view-in-${i}`,`M214 ${y}H${x-7}`,4100+i*180,4700+i*180);
         const [tx,ty] = point("views",220,rowY(i)+40), [mx,my] = point("model",0,50);
-        add(`encode-${i}`,`M${tx+2} ${ty}C445 ${ty},452 ${my},${mx-8} ${my}`,7400+i*180,8150+i*180);
+        add(`encode-${i}`,`M${tx+2} ${ty}C474 ${ty},486 ${my},${mx-8} ${my}`,7400+i*180,8150+i*180);
       });
-      const [mx,my] = point("model",170,161), [ex,ey] = point("embeddings",0,128);
-      add("model-out",`M${mx+2} ${my}H${ex-9}`,8900,10000);
-      add("distribution","M940 320H987",13000,14000);
+      const [mx,my] = point("model",170,199), [ex,ey] = point("embeddings",0,128);
+      add("model-out",`M${mx+2} ${my}C${mx+22} ${my},${ex-29} ${ey},${ex-9} ${ey}`,8900,10000);
+      add("distribution","M970 238H1022",13000,14000);
     }
     get("connections").innerHTML = specs.map(edge => path(edge.d,`id="ma-path-${edge.id}" pathLength="1"`)).join("");
     connections = specs.map(edge => ({...edge,node:get(`path-${edge.id}`)}));
@@ -255,7 +253,9 @@
       const drop=smooth(t,5200,6500),strength=.25+.65*smooth(t,6300,7500);
       opacity(`row-${i}-video`,strength*(view.video?1:1-drop));
       opacity(`row-${i}-audio`,strength*(view.audio?1:1-drop));
-      if(!view.video||!view.audio)opacity(`drop-${i}`,drop);
+      const compact=smooth(t,6500,7500);
+      if(!view.video) get(`row-${i}-audio`).setAttribute("transform",`translate(${-60*compact} 0)`);
+      if(!view.video||!view.audio)opacity(`drop-${i}`,drop*(1-compact));
     });
     opacity("model",smooth(t,7800,8450));opacity("readout",smooth(t,8500,9000));
     opacity("model-pulse",Math.max(Math.sin(smooth(t,8100,9550)*Math.PI)*.65,Math.sin(smooth(t,16200,17600)*Math.PI)*.8));
@@ -274,7 +274,7 @@
     drawLosses(t);
     const nextPhase=stages.findLastIndex(([start])=>t>=start);
     if(phase!==nextPhase){
-      phase=nextPhase;get("explanation").textContent=stages[phase][2];
+      phase=nextPhase;
       root.querySelectorAll("[data-time]").forEach(button=>button.setAttribute("aria-current",String(Number(button.dataset.phase)===phase)));
     }
     // Native dragging owns the thumb until release; playback must not fight it.
@@ -282,8 +282,9 @@
     get("scrubber").style.setProperty("--progress",`${t/duration*100}%`);
     get("scrubber").setAttribute("aria-valuetext",`${(t/1000).toFixed(1)} seconds of 18. ${stages[phase][1]}.`);
     get("time").textContent=`0:${String(Math.floor(t/1000)).padStart(2,"0")} / 0:18`;
-    get("toggle").textContent=t>=duration?"Play again":playing?"Pause":"Play";
-    get("toggle").setAttribute("aria-label",playing&&t<duration?"Pause method animation":"Play method animation");
+    const active=playing&&t<duration;
+    get("play-icon").setAttribute("d",active?"M4 2H6V14H4ZM10 2H12V14H10Z":"M4 2L14 8L4 14Z");
+    get("toggle").setAttribute("aria-label",active?"Pause animation":"Play animation");
   }
   // Keep SVG nodes alive while animating; rebuilding the plots every frame
   // caused unnecessary allocation and paint work alongside the timeline.
@@ -309,7 +310,7 @@
   const axis = svgNode("line",{},get("batch-axis"));
   // A distribution-level illustration of SIGReg's target, not its numerical
   // characteristic-function test. Bins follow the same projected batch points.
-  const bars=Array.from({length:16},(_,i)=>svgNode("rect",{x:i*180/16+.8,width:180/16-1.6,rx:2,fill:"#a7f3d0"},get("histogram")));
+  const bars=Array.from({length:16},(_,i)=>svgNode("rect",{x:i*180/16+.8,width:180/16-1.6,rx:2,fill:"#64748b",opacity:.75},get("histogram")));
   const projectionSamples=batch.map(()=>svgNode("circle",{cy:30,r:2,fill:R,opacity:.6},get("projection-samples")));
   get("gaussian").setAttribute("d",Array.from({length:65},(_,i)=>`${i?"L":"M"}${i*180/64},${176-Math.exp(-.5*(-3+i*6/64)**2)/Math.sqrt(2*Math.PI)*195}`).join(" "));
   get("gaussian").style.strokeDasharray="1";
@@ -374,7 +375,6 @@
     if(elapsed>=duration){elapsed=0;playing=true;}else playing=!playing;
     stopFrame();render();resume();
   });
-  get("replay").addEventListener("click",()=>{elapsed=0;playing=true;stopFrame();render();resume();});
   new IntersectionObserver(entries=>{
     visible=entries[entries.length-1].isIntersecting;if(visible)resume();else stopFrame();
   },{threshold:0}).observe(root);

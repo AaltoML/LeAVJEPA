@@ -24,3 +24,11 @@ of all 17 result rows and three protocol notes, pause/drag/resume and reverse
 seeking, 32 distinct timeline updates over 32 sampled frames, existing figure
 lightboxes, and tables with JavaScript disabled. No JavaScript errors or missing
 local assets.
+
+The figure caption follows the ICLR 2027 teaser caption
+(`papers/iclr2027/main.tex`, Figure 1), using this page's AV-JEPA name.
+The diagram has an icon-only play/pause control and scrubber, with no narration
+band or replay button. On desktop the view rows, Vision Transformer/projector,
+embedding panel and SIGReg panel share a vertical centerline. The projector
+readout has a longer connector; modality token sequences are contiguous and
+local sequences shorten as their missing modality is removed.
