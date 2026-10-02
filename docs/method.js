@@ -19,7 +19,7 @@
   const dot = (x, y, r, fill, attrs = "") => `<circle cx="${x}" cy="${y}" r="${r}" fill="${fill}" ${attrs}/>`;
   const path = (d, attrs = "") => `<path d="${d}" fill="none" ${attrs}/>`;
   const image = (name, x, y, w, h, attrs = "") => `<image href="${asset}${name}" x="${x}" y="${y}" width="${w}" height="${h}" preserveAspectRatio="${name.includes("frame") ? "xMidYMid slice" : "none"}" ${attrs}/>`;
-  const rowY = i => i * 73;
+  const rowY = i => i * 73, viewW = 196;
   const views = [
     { name: "Global 1 · A + V", video: true, audio: true },
     { name: "Global 2 · A + V", video: true, audio: true },
@@ -37,16 +37,9 @@
   const tubeletCells = [[132,12],[144,72],[72,108]];
   const batch = Array.from({ length: 40 }, (_, i) => {
     const r = Math.sqrt(-2*Math.log((i+.5)/40)), angle = i*2.39996323;
-    return [.72*r*Math.cos(angle)+.45, 1.2*r*Math.sin(angle)-.25];
+    return [.72*r*Math.cos(angle)+.45, 1.2*r*Math.sin(angle)-.25, r*Math.cos(angle), r*Math.sin(angle)];
   });
   root.innerHTML = `
-    <div class="ma-timeline">
-      <div class="ma-playback"><button id="ma-toggle" type="button" aria-label="Pause animation"><svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path id="ma-play-icon" d="M4 2H6V14H4ZM10 2H12V14H10Z"/></svg></button><output id="ma-time" for="ma-scrubber">0:00 / 0:18</output></div>
-      <input id="ma-scrubber" type="range" min="0" max="${duration}" step="any" value="0" aria-label="Method animation timeline">
-      <div class="ma-marks" role="group" aria-label="Jump to a point in the animation">
-        ${stages.map(([, name], i) => `<button type="button" data-time="${stops[i]}" data-phase="${i}" style="--position:${stops[i]/duration*100}%" aria-label="Go to ${name.toLowerCase()}, ${stops[i]/1000} seconds"><i aria-hidden="true"></i><span>${name === "Alignment" ? "Align" : name === "Encoder" ? "Model" : name}</span></button>`).join("")}
-      </div>
-    </div>
     <svg class="ma-canvas" viewBox="0 0 1220 570" role="img" aria-labelledby="ma-title ma-desc">
       <title id="ma-title">The complete LeAVJEPA method, built from one guitar sample</title>
       <desc id="ma-desc">Frames and the spectrogram separate into patches. Two global views retain both modalities; two locals retain only audio or video. Each sequence starts with a labeled CLS token. A shared transformer repeats attention and MLP blocks, then its CLS output passes through the projector. Three stacked frames reveal temporal depth, with matching patches extending backward. Tubelets group patches from neighboring frame pairs. In the latent space, alignment brings views of one clip together. SIGReg compares characteristic functions of projected batches with the Gaussian target. The weighted losses update the shared encoder and projector.</desc>
@@ -60,7 +53,7 @@
       </defs>
       <g id="ma-connections" stroke="#a1a1aa" stroke-width="1.3" marker-end="url(#ma-arrow)"></g>
       <g id="ma-video">
-        ${text(96,-23,"Video",'id="ma-video-label" text-anchor="middle" class="ma-kicker" fill="'+V+'"')}
+        ${text(96,-12,"Video",'id="ma-video-label" text-anchor="middle" class="ma-kicker" fill="'+V+'"')}
         ${[2,1,0].map(i=>`<g id="ma-frame-${i}" transform="translate(${i*12} ${28-i*14})" opacity="${1-i*.23}">
           ${rect(0,0,168,168,"white")}
           <g class="ma-frame-sheet"><use href="#ma-frame-source-${i}"/></g>
@@ -80,7 +73,7 @@
         </g>
       </g>
       <g id="ma-audio">
-        ${text(90,-23,"Waveform",'id="ma-audio-label" text-anchor="middle" class="ma-kicker"')}
+        ${text(90,-12,"Waveform",'id="ma-audio-label" text-anchor="middle" class="ma-kicker"')}
         ${rect(0,0,180,90,"#fff1f2")}
         <g id="ma-wave">${image("guitar-wave.svg",0,12,180,66)}</g>
         <g id="ma-audio-sheet" clip-path="url(#ma-mel-clip)">${image("guitar-mel.png",0,0,180,90)}</g>
@@ -91,14 +84,13 @@
 
       </g>
       <g id="ma-views">
-        ${text(110,-26,"Views → tokens",'text-anchor="middle" class="ma-kicker"')}
+        ${text(viewW/2,-26,"Views → tokens",'text-anchor="middle" class="ma-kicker"')}
         ${views.map((view,i)=>`<g id="ma-view-${i}" transform="translate(0 ${rowY(i)})">
-          ${rect(0,0,220,62,"#ffffff",'stroke="#e4e4e7"')}${text(12,18,view.name,'class="ma-view-name"')}
+          ${rect(0,0,viewW,62,"#ffffff",'stroke="#e4e4e7"')}${text(12,18,view.name,'class="ma-view-name"')}
           ${rect(10,29,46,23,"#eff6ff",'stroke="#bfdbfe"')}${text(33,45,"[CLS]",'text-anchor="middle" class="ma-cls-label"')}
-          <g id="ma-row-${i}-video" class="ma-video-tokens">${tokenStrip("video",68)}</g>
-          <g id="ma-row-${i}-audio" class="ma-audio-tokens">${tokenStrip("audio",128)}</g>
-          ${!view.video ? `<g id="ma-drop-${i}">${rect(68,31,57,19,"#fafafa",'stroke="#d4d4d8" stroke-dasharray="3 3"')}${path("M91 36L101 45M101 36L91 45",'stroke="#d4d4d8"')}</g>` : ""}
-          ${!view.audio ? `<g id="ma-drop-${i}">${rect(128,31,57,19,"#fafafa",'stroke="#d4d4d8" stroke-dasharray="3 3"')}${path("M151 36L161 45M161 36L151 45",'stroke="#d4d4d8"')}</g>` : ""}
+          <g id="ma-row-${i}-video" class="ma-video-tokens">${tokenStrip("video",view.audio?68:128)}</g>
+          <g id="ma-row-${i}-audio" class="ma-audio-tokens">${tokenStrip("audio",view.audio?128:68)}</g>
+          ${!view.video||!view.audio ? `<g id="ma-drop-${i}">${rect(68,31,57,19,"#fafafa",'stroke="#d4d4d8" stroke-dasharray="3 3"')}${path("M91 36L101 45M101 36L91 45",'stroke="#d4d4d8"')}</g>` : ""}
         </g>`).join("")}
 
 
@@ -119,9 +111,9 @@
 
       </g>
       <g id="ma-embeddings">
-        ${text(125,-31,"Embeddings",'text-anchor="middle" class="ma-kicker"')}
-
-        ${rect(0,0,250,260,"#ffffff",'stroke="#e4e4e7"')}
+        ${text(105,-31,"Embeddings",'text-anchor="middle" class="ma-kicker"')}
+        ${rect(0,0,210,224,"#ffffff",'stroke="#e4e4e7"')}
+        <g transform="translate(105 103) scale(.84) translate(-125 -128)">
         ${path("M20 15V215H232",'stroke="#f4f4f5" stroke-width="1"')}
         <g id="ma-sigreg">
           <g id="ma-batch-drops" stroke="${R}" stroke-width=".65" stroke-opacity=".16"></g>
@@ -130,9 +122,10 @@
         <g id="ma-alignment">
           <g id="ma-align-lines" stroke-width="1.2" stroke-dasharray="3 4"></g>
           ${path("M125 120L133 128L125 136L117 128Z",'fill="white" stroke="'+ink+'" stroke-width="1.7"')}
-          ${text(125,240,"Align the views",'text-anchor="middle" class="ma-prominent"')}
         </g>
         <g id="ma-align-points"></g>
+        </g>
+        ${text(105,206,"Align the views",'id="ma-align-label" text-anchor="middle" class="ma-prominent"')}
       </g>
       <g id="ma-distribution">
         ${text(90,-31,"SIGReg",'text-anchor="middle" class="ma-kicker"')}
@@ -146,6 +139,12 @@
         ${text(90,216,"Gaussian target",'text-anchor="middle" class="ma-prominent"')}
       </g>
     </svg>
+    <div class="ma-timeline">
+      <input id="ma-scrubber" type="range" min="0" max="${duration}" step="any" value="0" aria-label="Method animation timeline">
+      <div class="ma-marks" role="group" aria-label="Jump to a point in the animation">
+        ${stages.map(([, name], i) => `<button type="button" data-time="${stops[i]}" data-phase="${i}" style="--position:${stops[i]/duration*100}%" aria-label="Go to ${name.toLowerCase()}, ${stops[i]/1000} seconds"><i aria-hidden="true"></i><span>${name === "Alignment" ? "Align" : name === "Encoder" ? "Model" : name}</span></button>`).join("")}
+      </div>
+    </div>
 `;
 
   const staticNodes = new Map([...root.querySelectorAll("[id]")].map(node => [node.id, node]));
@@ -168,13 +167,13 @@
   const point = (id,x,y) => { const [px,py,s]=positions[id]; return [px+x*s,py+y*s]; };
   function layout() {
     const small = mobile.matches;
-    root.querySelector("svg.ma-canvas").setAttribute("viewBox", small ? "0 0 370 1670" : "0 0 1260 480");
+    root.querySelector("svg.ma-canvas").setAttribute("viewBox", small ? "0 0 370 1634" : "0 0 1220 480");
     positions = small ? {
       video: [21,49,.8], audio: [207,96,.78], views: [74,334,1], model: [100,756,1],
-      embeddings: [60,1080,1], distribution: [95,1420,1],
+      embeddings: [80,1080,1], distribution: [95,1384,1],
     } : {
-      video: [24,76,.82], audio: [24,338,.82], views: [254,110,.92], model: [512,140,.9],
-      embeddings: [718,110,1], distribution: [1034,132,1],
+      video: [24,66,.82], audio: [24,311,.82], views: [254,110,.92], model: [512,140,.9],
+      embeddings: [718,128,1], distribution: [994,132,1],
     };
     Object.entries(positions).forEach(([id,[x,y,scale]]) => get(id).setAttribute("transform",`translate(${x} ${y}) scale(${scale})`));
     const specs = [];
@@ -184,11 +183,11 @@
       add("source-audio","M276 169V276H185",3500,4200,false);
       add("source-view","M185 276V282",4000,4400);
       views.forEach((_,i) => {
-        const [x,y] = point("views",220,rowY(i)+40);
+        const [x,y] = point("views",viewW,rowY(i)+40);
         add(`encode-${i}`,`M${x+2} ${y}H326V686H185V700`,7400+i*180,8150+i*180);
       });
       add("model-out","M185 980V1030",8900,10000);
-      add("distribution","M185 1342V1360",13000,14000);
+      add("distribution","M185 1306V1324",13000,14000);
     } else {
       const [vx,vy] = point("video",194,98), [ax,ay] = point("audio",181,45);
       add("source-video",`M${vx+2} ${vy}H214`,3500,4300,false);
@@ -197,12 +196,15 @@
       views.forEach((_,i) => {
         const [x,y] = point("views",0,rowY(i)+40);
         add(`view-in-${i}`,`M214 ${y}H${x-7}`,4100+i*180,4700+i*180);
-        const [tx,ty] = point("views",220,rowY(i)+40), [mx,my] = point("model",0,50);
-        add(`encode-${i}`,`M${tx+2} ${ty}C474 ${ty},486 ${my},${mx-8} ${my}`,7400+i*180,8150+i*180);
+        const [tx,ty] = point("views",viewW,rowY(i)+40), [mx,my] = point("model",0,50);
+        add(`encode-${i}`,`M${tx+2} ${ty}H${tx+22}`,7400+i*180,7900+i*180,false);
       });
-      const [mx,my] = point("model",170,199), [ex,ey] = point("embeddings",0,128);
-      add("model-out",`M${mx+2} ${my}C${mx+22} ${my},${ex-29} ${ey},${ex-9} ${ey}`,8900,10000);
-      add("distribution","M970 238H1022",13000,14000);
+      const [bx,top] = point("views",viewW,40), [,bottom] = point("views",viewW,rowY(3)+40), [jx,jy] = point("model",0,50);
+      add("encode-bus",`M${bx+22} ${top}V${bottom}`,7400,8300,false);
+      add("encode-join",`M${bx+22} ${jy}H${jx-8}`,8000,8500);
+      const [mx,my] = point("model",170,199), [ex] = point("embeddings",0,0);
+      add("model-out",`M${mx+2} ${my}H${ex-9}`,8900,10000);
+      add("distribution","M930 238H982",13000,14000);
     }
     get("connections").innerHTML = specs.map(edge => path(edge.d,`id="ma-path-${edge.id}" pathLength="1"`)).join("");
     connections = specs.map(edge => ({...edge,node:get(`path-${edge.id}`)}));
@@ -246,14 +248,14 @@
       opacity(`row-${i}-video`,strength*(view.video?1:1-drop));
       opacity(`row-${i}-audio`,strength*(view.audio?1:1-drop));
       const compact=smooth(t,6500,7500);
-      if(!view.video) get(`row-${i}-audio`).setAttribute("transform",`translate(${-60*compact} 0)`);
+      if(!view.video||!view.audio) get(`row-${i}-${view.video?"video":"audio"}`).setAttribute("transform",`translate(${-60*compact} 0)`);
       if(!view.video||!view.audio)opacity(`drop-${i}`,drop*(1-compact));
     });
     opacity("model",smooth(t,7800,8450));opacity("readout",smooth(t,8500,9000));
     opacity("model-pulse",Math.max(Math.sin(smooth(t,8100,9550)*Math.PI)*.65,Math.sin(smooth(t,16200,17600)*Math.PI)*.8));
     opacity("projector-pulse",Math.sin(smooth(t,16200,17600)*Math.PI)*.8);
     opacity("embeddings",smooth(t,9300,10100));
-    opacity("alignment",smooth(t,10500,11200));opacity("sigreg",smooth(t,13000,13700));
+    opacity("alignment",smooth(t,10500,11200));opacity("align-label",smooth(t,10500,11200));opacity("sigreg",smooth(t,13000,13700));
     opacity("distribution",smooth(t,13500,14100));
     connections.forEach(connection=>{
       const p=smooth(t,connection.start,connection.end);
@@ -271,10 +273,6 @@
     if (!dragging) get("scrubber").value=String(t);
     get("scrubber").style.setProperty("--progress",`${t/duration*100}%`);
     get("scrubber").setAttribute("aria-valuetext",`${(t/1000).toFixed(1)} seconds of 18. ${stages[phase][1]}.`);
-    get("time").textContent=`0:${String(Math.floor(t/1000)).padStart(2,"0")} / 0:18`;
-    const active=playing&&t<duration;
-    get("play-icon").setAttribute("d",active?"M4 2H6V14H4ZM10 2H12V14H10Z":"M4 2L14 8L4 14Z");
-    get("toggle").setAttribute("aria-label",active?"Pause animation":"Play animation");
   }
   function svgNode(tag, attributes, parent) {
     const node = document.createElementNS("http://www.w3.org/2000/svg",tag);
@@ -287,22 +285,23 @@
     const circle = svgNode("circle",{r:5.5,fill:color,stroke:"white","stroke-width":1.5},get("align-points"));
     return {x,y,line,circle};
   });
-  const cloud = batch.map(([x,y]) => {
-    const px=125+x*31, py=128+y*31;
-    svgNode("circle",{cx:px,cy:py,r:2.6,fill:"#a1a1aa"},get("batch-original"));
-    return {x,y,px,py,
-      drop:svgNode("line",{x1:px,y1:py},get("batch-drops")),
+  const cloud = batch.map(([x,y,tx,ty]) => ({x,y,tx,ty,
+      original:svgNode("circle",{r:2.6,fill:"#a1a1aa"},get("batch-original")),
+      drop:svgNode("line",{},get("batch-drops")),
       projected:svgNode("circle",{r:2.1,fill:R},get("batch-projected")),
-    };
-  });
+  }));
   const axis = svgNode("line",{},get("batch-axis"));
   const bars=Array.from({length:16},(_,i)=>svgNode("rect",{x:i*180/16+.8,width:180/16-1.6,rx:2,fill:"#64748b",opacity:.75},get("histogram")));
   const projectionSamples=batch.map(()=>svgNode("circle",{cy:30,r:2,fill:R,opacity:.6},get("projection-samples")));
   get("gaussian").setAttribute("d",Array.from({length:65},(_,i)=>`${i?"L":"M"}${i*180/64},${176-Math.exp(-.5*(-3+i*6/64)**2)/Math.sqrt(2*Math.PI)*195}`).join(" "));
   get("gaussian").style.strokeDasharray="1";
+  const erf = x => { const s=Math.sign(x),a=Math.abs(x),k=1/(1+.3275911*a);
+    return s*(1-(((((1.061405429*k-1.453152027)*k+1.421413741)*k-.284496736)*k+.254829592)*k)*Math.exp(-a*a)); };
+  const cdf = x => .5*(1+erf(x/Math.SQRT2));
+  const target=bars.map((_,i)=>(cdf(-3+(i+1)*6/16)-cdf(-3+i*6/16))/(6/16)*195);
   let lastLossTime = null;
   function drawLosses(t) {
-    const time = Math.max(9300,Math.min(16000,t));
+    const time = Math.max(9300,Math.min(duration,t));
     if (time === lastLossTime) return;
     lastLossTime = time;
     const pull=1-.76*smooth(time,11100,12900);
@@ -313,8 +312,12 @@
     });
     const project=smooth(time,13300,14300),angle=-.75+smooth(time,14300,15800)*1.05;
     const cos=Math.cos(angle),sin=Math.sin(angle),scalars=[];
-    cloud.forEach(({x,y,px,py,drop,projected}) => {
+    const settle=smooth(time,16000,17600);
+    cloud.forEach(({x:bx,y:by,tx,ty,original,drop,projected}) => {
+      const x=bx+(tx-bx)*settle,y=by+(ty-by)*settle,px=125+x*31,py=128+y*31;
       const scalar=x*cos+y*sin, ax=125+scalar*cos*31,ay=128+scalar*sin*31;
+      original.setAttribute("cx",px);original.setAttribute("cy",py);
+      drop.setAttribute("x1",px);drop.setAttribute("y1",py);
       drop.setAttribute("x2",ax);drop.setAttribute("y2",ay);
       projected.setAttribute("cx",px+(ax-px)*project);projected.setAttribute("cy",py+(ay-py)*project);
       scalars.push(scalar);
@@ -330,7 +333,8 @@
     });
     const rise=smooth(time,13800,14800);
     bars.forEach((bar,i)=>{
-      const height=bins[i]/batch.length/(6/16)*195*rise;
+      const sample=bins[i]/batch.length/(6/16)*195;
+      const height=(sample+(target[i]-sample)*settle)*rise;
       bar.setAttribute("y",176-height);bar.setAttribute("height",height);
     });
     get("gaussian").style.strokeDashoffset=1-smooth(time,14300,15400);
@@ -355,10 +359,6 @@
   window.addEventListener("pointercancel",finishScrub);
   window.addEventListener("blur",finishScrub);
   root.querySelectorAll("[data-time]").forEach(button=>button.addEventListener("click",()=>seek(Number(button.dataset.time))));
-  get("toggle").addEventListener("click",()=>{
-    if(elapsed>=duration){elapsed=0;playing=true;}else playing=!playing;
-    stopFrame();render();resume();
-  });
   new IntersectionObserver(entries=>{
     visible=entries[entries.length-1].isIntersecting;if(visible)resume();else stopFrame();
   },{threshold:0}).observe(root);
