@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AV-JEPA: Extending LeJEPA to Audio-Visual Self-Supervised Learning</title>
-<meta name="description" content="AV-JEPA extends LeJEPA to audio-visual self-supervised learning with an early-fusion ViT and modality dropout as masking. No decoder, no EMA teacher, no contrastive negatives. Frozen transfer, end-to-end fine-tuning, and zero-shot audio-video retrieval.">
+<title>LeAVJEPA: A Minimalist Architecture for Audio-Visual Self-Supervised Learning</title>
+<meta name="description" content="LeAVJEPA learns audio-visual representations with one shared Vision Transformer, modality dropout, and the LeJEPA objective. Frozen transfer, end-to-end fine-tuning, and cross-modal retrieval.">
 <meta property="og:type" content="website">
-<meta property="og:title" content="AV-JEPA: Extending LeJEPA to Audio-Visual Self-Supervised Learning">
-<meta property="og:description" content="A clean JEPA recipe for audio-visual SSL: one shared encoder, one loss, no decoder, EMA teacher, or contrastive negatives. Frozen transfer, end-to-end fine-tuning, and zero-shot audio-video retrieval.">
+<meta property="og:title" content="LeAVJEPA: A Minimalist Architecture for Audio-Visual Self-Supervised Learning">
+<meta property="og:description" content="LeAVJEPA learns audio-visual representations with one shared Vision Transformer, modality dropout, and the LeJEPA objective. Frozen transfer, end-to-end fine-tuning, and cross-modal retrieval.">
 <meta name="twitter:card" content="summary">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231d4ed8'/%3E%3Cpath d='M8 16h3l2.5-6 3.5 12 3-9 2 3h2' stroke='white' stroke-width='2.2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 <style>
@@ -44,21 +44,6 @@
 
   /* ---------- header ---------- */
   header.wrap { padding-top: 72px; padding-bottom: 8px; text-align: center; }
-  .venue-badge {
-    display: inline-block;
-    font-size: 13px;
-    font-weight: 600;
-    letter-spacing: .02em;
-    color: var(--accent);
-    background: var(--ours);
-    border: 1px solid #d3e2fb;
-    border-radius: 999px;
-    padding: 5px 14px;
-    margin-bottom: 40px;
-    text-decoration: none;
-    transition: background .15s ease, border-color .15s ease;
-  }
-  a.venue-badge:hover { background: #e0edfd; border-color: #b6d0f7; text-decoration: none; }
   h1 {
     font-size: clamp(34px, 6vw, 52px);
     line-height: 1.1;
@@ -278,7 +263,6 @@
 
   @media (max-width: 720px) {
     header.wrap { padding-top: 28px; }
-    .venue-badge { margin-bottom: 28px; }
     .stats { grid-template-columns: repeat(2, 1fr); }
     .cards, .three-up { grid-template-columns: 1fr; }
     .two-up { grid-template-columns: 1fr; }
@@ -286,13 +270,13 @@
   }
 </style>
 <link rel="stylesheet" href="method.css">
+<link rel="stylesheet" href="paper.css">
 <script src="method.js" defer></script>
 </head>
 <body>
 
 <header class="wrap">
-  <a class="venue-badge" href="https://mlforaudioworkshop.github.io/">Learning to Listen &middot; ICML 2026 Workshop on Machine Learning for Audio</a>
-  <h1>AV&#8209;JEPA<span class="sub">Extending LeJEPA to Audio&#8209;Visual Self&#8209;Supervised Learning</span></h1>
+  <h1>LeAVJEPA<span class="sub">A Minimalist Architecture for Audio-Visual Self-Supervised Learning</span></h1>
   <p class="authors">
     <span><a href="https://benjaminhr.com/">Benjamin Robson</a></span> &middot;
     <span><a href="https://scholar.google.com/citations?user=35fWh2oAAAAJ&amp;hl=en">Santeri Mentu</a></span> &middot;
@@ -302,7 +286,7 @@
   <p class="affil">ELLIS Institute Finland &amp; Aalto University</p>
 
   <div class="links">
-    <a class="btn" href="https://arxiv.org/abs/2607.15295">
+    <a class="btn" href="assets/leavjepa.pdf">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>
       Paper
     </a>
@@ -321,93 +305,112 @@
 
 <main class="wrap">
 
-  <section id="teaser" aria-label="The AV-JEPA method">
+  <section id="teaser" aria-label="The LeAVJEPA method">
     <figure class="method-figure">
       <div class="method-tour" id="method-tour">
         <p>Audio becomes a log-mel spectrogram; video becomes tubelets. Two joint global views and two modality-specific local views pass through one transformer and projector. Alignment brings their embeddings together; SIGReg prevents collapse across the batch.</p>
         <p>Enable JavaScript to explore the method animation.</p>
       </div>
-      <figcaption><b>AV&#8209;JEPA connects sound and vision by dropping a modality.</b> One shared encoder aligns audio-only and video-only views with joint audio-video views. MSE brings embeddings together; SIGReg prevents collapse, without a teacher, predictor, or contrastive negatives. Latent geometry is illustrative.</figcaption>
+      <figcaption><b>LeAVJEPA connects sound and vision by dropping a modality.</b> One shared encoder aligns audio-only and video-only views with joint audio-video views. MSE brings embeddings together; SIGReg prevents collapse, without a teacher, predictor, or contrastive negatives. Latent geometry is illustrative.</figcaption>
     </figure>
   </section>
 
   <section id="abstract">
     <h2>Abstract</h2>
-    <div class="abstract-box"><p>We present AV&#8209;JEPA, an elegant multimodal extension of LeJEPA to audio-visual self-supervised learning. Using an early-fusion Vision Transformer and <em>modality dropout as masking</em>, the model is trained to align the embeddings of global and per-modality local views, while the SIGReg objective encourages a theoretically optimal distribution. This achieves cross-modal alignment in the latent space, resulting in a remarkably clean architecture with no decoder, EMA teacher, complex multi-term losses, or contrastive negatives. The backbone supports audio-visual classification and zero-shot audio-video retrieval out of the box.</p></div>
+    <div class="abstract-box"><p>Prior audio-visual self-supervised learning methods rely on mechanisms such as EMA target encoders, prediction heads, reconstruction decoders, and contrastive losses. We introduce LeAVJEPA, the first audio-visual encoder trained under LeJEPA&#x27;s collapse-free objective. A single early-fusion Vision Transformer processes audio, video, and joint audio-video inputs. Modality dropout treats a missing modality as another view of the same event, making cross-modal alignment implicit in the objective. The model aligns global embeddings with modality-specific local embeddings, and SIGReg prevents representational collapse. A controlled ablation identifies modality dropout as the key mechanism for audio-visual alignment. Despite the architectural simplicity, LeAVJEPA reaches 36.0 mAP on AudioSet-20K and 91.3% accuracy on ESC-50 under frozen evaluation. After fine-tuning, it reaches 61.1% accuracy on VGGSound, and its embeddings support zero-shot audio-visual retrieval.</p></div>
   </section>
 
   <section id="method">
     <h2>How it works</h2>
-    <p>Prior audio-visual SSL methods reconstruct masked inputs through dedicated decoders, often with contrastive losses and EMA teachers on top. AV&#8209;JEPA operates entirely in latent space, built from three ingredients:</p>
+    <p>LeAVJEPA learns in latent space with one shared encoder and a symmetric objective. Modality dropout makes audio-only and video-only observations agree with a joint audio-video representation, without an EMA teacher, reconstruction decoder, cross-modal predictor, or contrastive negatives during pretraining.</p>
     <div class="cards">
       <div class="card">
-        <h3>Early-fusion encoder</h3>
-        <p>Video tubelets (1568 tokens) and mel-spectrogram patches (400 tokens) are processed jointly by a single shared ViT&#8209;Base from the first layer.</p>
+        <h3>One shared transformer</h3>
+        <p>Video tubelets (1,568 tokens) and log-mel spectrogram patches (400 tokens) enter one early-fusion Vision Transformer, with ViT-B and ViT-L variants. A shared projector maps the [CLS] representation into the space used by the loss.</p>
       </div>
       <div class="card">
-        <h3>Modality dropout as masking</h3>
-        <p>Local views alternate between audio-only and video-only, the other modality zeroed. Aligning them with the joint-modality center makes cross-modal prediction an implicit latent-space task.</p>
+        <h3>Modality-specific views</h3>
+        <p>Two global views retain both modalities. Two local views alternate between audio-only and video-only: tokens from the absent modality are removed. “Local” means partial modality content; these views retain the same eight-second duration.</p>
       </div>
       <div class="card">
-        <h3>LeJEPA loss</h3>
-        <p>One invariance term plus SIGReg, which provably drives embeddings toward an isotropic Gaussian and prevents collapse. A single scalar &lambda; is the only loss hyperparameter.</p>
+        <h3>Alignment and SIGReg</h3>
+        <p>Mean-squared error aligns each view with the mean of the joint global embeddings. SIGReg regularizes the batch toward an isotropic Gaussian to prevent collapse. Both terms train the encoder and projector together.</p>
       </div>
     </div>
+    <figure>
+      <img class="zoomable" src="assets/fig_component_ablation.png" alt="VGGSound ablations: modality-specific local views give the highest linear and attentive probe accuracy; either alignment or SIGReg alone fails to learn useful features.">
+      <figcaption><b>Modality-specific views improve cross-modal learning in LeAVJEPA.</b> Left: joint local views remain near the audio-only baselines (dashed lines). Random modality dropout improves probe accuracy, and making every local view audio-only or video-only yields the largest gain. Right: either loss term alone fails to learn useful features.</figcaption>
+    </figure>
   </section>
 
   <section id="results">
-    <h2>Results</h2>
-    <p>Updated manuscript results for LeAVJEPA. Frozen attentive probes measure transfer with a fixed backbone; end-to-end fine-tuning updates the backbone as well.</p>
+    <h2>Frozen transfer</h2>
+    <p class="paper-caption" id="frozen-caption">Frozen transfer with an attentive probe. AudioSet-20K mAP for audio-only (A), video-only (V), and audio-video (A-V) inputs, and ESC-50 accuracy. Baseline frozen results and parameter counts are as reported by Teotia et al. (2026). Best result per column in bold. <sup>*</sup>Not reported in the MJEPA paper; provided by the authors through personal correspondence.</p>
     <div class="table-scroll" tabindex="0" role="region" aria-labelledby="frozen-caption">
-      <table data-result-table="frozen">
-        <caption id="frozen-caption">Frozen attentive evaluation · AudioSet-20K mAP and ESC-50 accuracy (%)</caption>
-        <thead><tr><th scope="col">Method</th><th scope="col">Pretraining</th><th scope="col" class="num">Audio</th><th scope="col" class="num">Video</th><th scope="col" class="num">Joint</th><th scope="col" class="num">ESC-50</th></tr></thead>
+      <table class="paper-table" data-result-table="frozen" aria-labelledby="frozen-caption">
+        <thead><tr><th colspan="4"></th><th colspan="3" scope="colgroup">AudioSet-20K (mAP)</th><th scope="col">ESC-50</th></tr><tr><th aria-label="Encoder arrangement"></th><th scope="col">Method</th><th scope="col">Params</th><th scope="col">Pre-train data</th><th scope="col" class="num">A</th><th scope="col" class="num">V</th><th scope="col" class="num">A-V</th><th scope="col" class="num">Acc.</th></tr></thead>
         <tbody>
-          <tr><th scope="row">CAV-MAE</th><td>IN + AS</td><td class="num">19.38</td><td class="num">18.14</td><td class="num">34.59</td><td class="num">77.5</td></tr>
-          <tr><th scope="row">MAViL</th><td>IN + AS</td><td class="num">30.00</td><td class="num">—</td><td class="num">—</td><td class="num">90.8</td></tr>
-          <tr><th scope="row">EquiAV</th><td>IN + AS</td><td class="num">34.25</td><td class="num">18.60</td><td class="num">38.60</td><td class="num">93.2</td></tr>
-          <tr><th scope="row">CAV-MAE Sync</th><td>IN + AS</td><td class="num">21.66</td><td class="num">16.20</td><td class="num">28.50</td><td class="num">89.2</td></tr>
-          <tr><th scope="row">XKD</th><td>AS</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">93.6</td></tr>
-          <tr><th scope="row">MJEPA ViT-B*</th><td>AS</td><td class="num">37.54</td><td class="num">20.18</td><td class="num">40.68</td><td class="num">—</td></tr>
-          <tr><th scope="row">MJEPA ViT-L</th><td>AS</td><td class="num">38.89</td><td class="num">25.38</td><td class="num">42.90</td><td class="num">95.2</td></tr>
-          <tr class="ours"><th scope="row">LeAVJEPA ViT-B</th><td>AS</td><td class="num">27.79</td><td class="num">14.82</td><td class="num">30.98</td><td class="num">88.0</td></tr>
-          <tr class="ours"><th scope="row">LeAVJEPA ViT-L</th><td>AS</td><td class="num">31.56</td><td class="num">18.25</td><td class="num">36.03</td><td class="num">91.3</td></tr>
+          <tr><th scope="rowgroup" rowspan="5" class="encoder-group"><span>Separate encoders</span></th><th scope="row">CAV-MAE <span class="table-citation">(Gong et al., 2023)</span></th><td>170M</td><td>IN+AS</td><td class="num">19.38</td><td class="num">18.14</td><td class="num">34.59</td><td class="num">77.5</td></tr>
+          <tr><th scope="row">MAViL <span class="table-citation">(Huang et al., 2023)</span></th><td>170M</td><td>IN+AS</td><td class="num">30.00</td><td class="num">–</td><td class="num">–</td><td class="num">90.8</td></tr>
+          <tr><th scope="row">EquiAV <span class="table-citation">(Kim et al., 2024)</span></th><td>170M</td><td>IN+AS</td><td class="num">34.25</td><td class="num">18.60</td><td class="num">38.60</td><td class="num">93.2</td></tr>
+          <tr><th scope="row">CAV-MAE Sync <span class="table-citation">(Araujo et al., 2025)</span></th><td>170M</td><td>IN+AS</td><td class="num">21.66</td><td class="num">16.20</td><td class="num">28.50</td><td class="num">89.2</td></tr>
+          <tr><th scope="row">XKD <span class="table-citation">(Sarkar &amp; Etemad, 2024)</span></th><td>170M</td><td>AS</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num">93.6</td></tr>
+        </tbody>
+        <tbody>
+          <tr><th scope="rowgroup" rowspan="4" class="encoder-group"><span>Shared encoder</span></th><th scope="row">MJEPA ViT-B<sup>*</sup> <span class="table-citation">(Teotia et al., 2026)</span></th><td>86M</td><td>AS</td><td class="num">37.54</td><td class="num">20.18</td><td class="num">40.68</td><td class="num">–</td></tr>
+          <tr><th scope="row">MJEPA ViT-L <span class="table-citation">(Teotia et al., 2026)</span></th><td>300M</td><td>AS</td><td class="num"><strong>38.89</strong></td><td class="num"><strong>25.38</strong></td><td class="num"><strong>42.90</strong></td><td class="num"><strong>95.2</strong></td></tr>
+          <tr><th scope="row">LeAVJEPA ViT-B (ours)</th><td>87M</td><td>AS</td><td class="num">27.79</td><td class="num">14.82</td><td class="num">30.98</td><td class="num">88.0</td></tr>
+          <tr><th scope="row">LeAVJEPA ViT-L (ours)</th><td>304M</td><td>AS</td><td class="num">31.56</td><td class="num">18.25</td><td class="num">36.03</td><td class="num">91.3</td></tr>
         </tbody>
       </table>
     </div>
-    <p class="tablenote">Frozen attentive probes. IN: ImageNet; AS: AudioSet. Baseline results follow the re-evaluations reported by MJEPA. *MJEPA ViT-B values were provided by its authors through personal correspondence, as stated in the manuscript. A dash denotes an unreported result.</p>
-
-    <div class="table-scroll" tabindex="0" role="region" aria-labelledby="finetuned-caption">
-      <table data-result-table="finetuned">
-        <caption id="finetuned-caption">VGGSound · end-to-end fine-tuning · top-1 accuracy (%)</caption>
-        <thead><tr><th scope="col">Model</th><th scope="col">Parameters</th><th scope="col">Pretraining</th><th scope="col" class="num">Linear head</th><th scope="col" class="num">Attentive head</th></tr></thead>
-        <tbody>
-          <tr class="ours"><th scope="row">LeAVJEPA ViT-B</th><td>87M</td><td>AudioSet-2M</td><td class="num">58.3</td><td class="num">60.4</td></tr>
-          <tr class="ours"><th scope="row">LeAVJEPA ViT-L</th><td>304M</td><td>AudioSet-2M</td><td class="num">59.9</td><td class="num">61.1</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <p class="tablenote">Supervised fine-tuning updates the backbone as well as the classification head. These results are distinct from frozen evaluation. Published MAViL and EquiAV results reach 67.1% in the manuscript comparison, with ImageNet initialization; consult the paper for the complete baseline table and protocol differences.</p>
   </section>
 
   <section id="retrieval">
-    <h2>Zero-shot cross-modal retrieval</h2>
-    <p>Audio-only and video-only inputs pass through the shared encoder. LeAVJEPA ranks candidates by cosine similarity of projected [CLS] features, without an additional retrieval head.</p>
+    <h2>Cross-modal retrieval</h2>
+    <p>LeAVJEPA retrieves paired audio and video by cosine similarity of projected [CLS] features. The additional InfoNCE-head experiment trains a contrastive head on frozen features and is not zero-shot.</p>
+    <p class="paper-caption" id="retrieval-caption">AudioSet cross-modal retrieval on the CAV-MAE balanced evaluation subset (1,725 clips; 1,722 available for our evaluation), recall in percent. Baseline rows are as reported in the respective papers and all train an explicit cross-modal alignment term or predictor; LeAVJEPA rows are zero-shot cosine retrieval unless marked. Best baseline result per column in bold. <sup>†</sup>MJEPA retrieves through its jointly trained cross-modal predictor with an L1 nearest-neighbour search rather than direct embedding similarity. <sup>‡</sup>Contrastive alignment head trained on frozen features; not zero-shot.</p>
     <div class="table-scroll" tabindex="0" role="region" aria-labelledby="retrieval-caption">
-      <table data-result-table="retrieval">
-        <caption id="retrieval-caption">AudioSet cross-modal retrieval · recall (%)</caption>
-        <thead><tr><th scope="col">Method</th><th scope="col" class="num">A→V R@1</th><th scope="col" class="num">A→V R@5</th><th scope="col" class="num">A→V R@10</th><th scope="col" class="num">V→A R@1</th><th scope="col" class="num">V→A R@5</th><th scope="col" class="num">V→A R@10</th></tr></thead>
+      <table class="paper-table" data-result-table="retrieval" aria-labelledby="retrieval-caption">
+        <thead><tr><th></th><th colspan="3" scope="colgroup">Audio → video</th><th colspan="3" scope="colgroup">Video → audio</th></tr><tr><th scope="col">Method</th><th scope="col" class="num">R@1</th><th scope="col" class="num">R@5</th><th scope="col" class="num">R@10</th><th scope="col" class="num">R@1</th><th scope="col" class="num">R@5</th><th scope="col" class="num">R@10</th></tr></thead>
         <tbody>
-          <tr><th scope="row">CAV-MAE</th><td class="num">15.1</td><td class="num">34.0</td><td class="num">43.0</td><td class="num">18.8</td><td class="num">39.5</td><td class="num">50.1</td></tr>
-          <tr><th scope="row">CAV-MAE Sync</th><td class="num">27.9</td><td class="num">52.4</td><td class="num">62.2</td><td class="num">35.2</td><td class="num">58.3</td><td class="num">67.6</td></tr>
-          <tr><th scope="row">EquiAV</th><td class="num">29.6</td><td class="num">53.7</td><td class="num">63.1</td><td class="num">30.1</td><td class="num">53.3</td><td class="num">62.9</td></tr>
-          <tr><th scope="row">MJEPA ViT-L†</th><td class="num">29.3</td><td class="num">53.7</td><td class="num">61.8</td><td class="num">30.6</td><td class="num">53.4</td><td class="num">61.3</td></tr>
-          <tr class="ours"><th scope="row">LeAVJEPA ViT-B</th><td class="num">10.5</td><td class="num">28.9</td><td class="num">36.6</td><td class="num">11.4</td><td class="num">28.2</td><td class="num">36.8</td></tr>
-          <tr class="ours"><th scope="row">LeAVJEPA ViT-L</th><td class="num">19.1</td><td class="num">40.5</td><td class="num">50.4</td><td class="num">18.7</td><td class="num">42.1</td><td class="num">51.9</td></tr>
+          <tr><th scope="row">CAV-MAE <span class="table-citation">(Gong et al., 2023)</span></th><td class="num">15.1</td><td class="num">34.0</td><td class="num">43.0</td><td class="num">18.8</td><td class="num">39.5</td><td class="num">50.1</td></tr>
+          <tr><th scope="row">CAV-MAE Sync <span class="table-citation">(Araujo et al., 2025)</span></th><td class="num">27.9</td><td class="num">52.4</td><td class="num">62.2</td><td class="num"><strong>35.2</strong></td><td class="num"><strong>58.3</strong></td><td class="num"><strong>67.6</strong></td></tr>
+          <tr><th scope="row">EquiAV <span class="table-citation">(Kim et al., 2024)</span></th><td class="num"><strong>29.6</strong></td><td class="num"><strong>53.7</strong></td><td class="num"><strong>63.1</strong></td><td class="num">30.1</td><td class="num">53.3</td><td class="num">62.9</td></tr>
+          <tr><th scope="row">MJEPA ViT-L<sup>†</sup> <span class="table-citation">(Teotia et al., 2026)</span></th><td class="num">29.3</td><td class="num"><strong>53.7</strong></td><td class="num">61.8</td><td class="num">30.6</td><td class="num">53.4</td><td class="num">61.3</td></tr>
+        </tbody>
+        <tbody>
+          <tr><th scope="row">LeAVJEPA ViT-B (ours)</th><td class="num">10.5</td><td class="num">28.9</td><td class="num">36.6</td><td class="num">11.4</td><td class="num">28.2</td><td class="num">36.8</td></tr>
+          <tr><th scope="row">LeAVJEPA ViT-L (ours)</th><td class="num">19.1</td><td class="num">40.5</td><td class="num">50.4</td><td class="num">18.7</td><td class="num">42.1</td><td class="num">51.9</td></tr>
+          <tr><th scope="row">LeAVJEPA ViT-L + InfoNCE head<sup>‡</sup> (ours)</th><td class="num">24.4</td><td class="num">46.9</td><td class="num">57.7</td><td class="num">25.6</td><td class="num">48.0</td><td class="num">57.1</td></tr>
         </tbody>
       </table>
     </div>
-    <p class="tablenote">CAV-MAE balanced AudioSet subset: 1,725 clips; 1,722 available for our evaluation. LeAVJEPA uses zero-shot cosine retrieval of projected [CLS] features. Baselines use explicit alignment objectives or predictors. †MJEPA uses its trained cross-modal predictor with L1 nearest-neighbor search. The separate InfoNCE-head experiment is omitted here because it is not zero-shot.</p>
+  </section>
+
+  <section id="finetuning">
+    <h2>End-to-end fine-tuning</h2>
+    <p class="paper-caption" id="finetuned-caption">Audio-visual classification on VGGSound (top-1, end-to-end fine-tuning). Published baselines all use separate audio and video encoders, except AVSiam, and are listed above the rule; our AudioSet-pretrained shared-encoder ViT-B (87M) and ViT-L (304M) below it. Best result per block in bold.</p>
+    <div class="table-scroll" tabindex="0" role="region" aria-labelledby="finetuned-caption">
+      <table class="paper-table" data-result-table="finetuned" aria-labelledby="finetuned-caption">
+        <thead><tr><th scope="col">Method</th><th scope="col">Params</th><th scope="col">Init.</th><th scope="col">Pretraining</th><th scope="col">Top-1</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">AV-MAE <span class="table-citation">(Georgescu et al., 2023)</span></th><td class="num">172M</td><td>–</td><td>VGGS</td><td class="num">64.2</td></tr>
+          <tr><th scope="row">AV-MAE <span class="table-citation">(Georgescu et al., 2023)</span></th><td class="num">611M</td><td>–</td><td>VGGS</td><td class="num">65.0</td></tr>
+          <tr><th scope="row">AVSiam <span class="table-citation">(Lin &amp; Bertasius, 2024)</span></th><td class="num">100M</td><td>IN-21K SL</td><td>AS-2M</td><td class="num">64.9</td></tr>
+          <tr><th scope="row">AVSiam <span class="table-citation">(Lin &amp; Bertasius, 2024)</span></th><td class="num">332M</td><td>IN-21K SL</td><td>AS-2M</td><td class="num">67.1</td></tr>
+          <tr><th scope="row">CAV-MAE <span class="table-citation">(Gong et al., 2023)</span></th><td class="num">164M</td><td>IN-SSL</td><td>AS-2M</td><td class="num">65.5</td></tr>
+          <tr><th scope="row">MAViL <span class="table-citation">(Huang et al., 2023)</span></th><td class="num">172M</td><td>IN-SSL</td><td>AS-2M</td><td class="num"><strong>67.1</strong></td></tr>
+          <tr><th scope="row">EquiAV <span class="table-citation">(Kim et al., 2024)</span></th><td class="num">172M</td><td>IN-SSL</td><td>AS-2M</td><td class="num"><strong>67.1</strong></td></tr>
+        </tbody>
+        <tbody>
+          <tr><th scope="row">LeAVJEPA (Linear)</th><td class="num">87M</td><td>–</td><td>AS-2M</td><td class="num">58.3</td></tr>
+          <tr><th scope="row">LeAVJEPA (Attentive)</th><td class="num">87M</td><td>–</td><td>AS-2M</td><td class="num">60.4</td></tr>
+          <tr><th scope="row">LeAVJEPA (Linear)</th><td class="num">304M</td><td>–</td><td>AS-2M</td><td class="num">59.9</td></tr>
+          <tr><th scope="row">LeAVJEPA (Attentive)</th><td class="num">304M</td><td>–</td><td>AS-2M</td><td class="num"><strong>61.1</strong></td></tr>
+        </tbody>
+      </table>
+    </div>
   </section>
 
   <section id="attention">
@@ -456,11 +459,11 @@
     <h2>BibTeX</h2>
     <div class="bib-box">
       <button class="copy-btn" onclick="copyBib(this)">Copy</button>
-      <pre class="bibtex" id="bib">@inproceedings{robson2026avjepa,
-  title     = {{AV-JEPA}: Extending {LeJEPA} to Audio-Visual Self-Supervised Learning},
-  author    = {Robson, Benjamin and Mentu, Santeri and Zhao, Wenshuai and Solin, Arno},
-  booktitle = {ICML 2026 Workshop on Machine Learning for Audio},
-  year      = {2026}
+      <pre class="bibtex" id="bib">@misc{robson2026leavjepa,
+  title  = {{LeAVJEPA}: A Minimalist Architecture for Audio-Visual Self-Supervised Learning},
+  author = {Robson, Benjamin and Mentu, Santeri and Zhao, Wenshuai and Solin, Arno},
+  year   = {2026},
+  note   = {Preprint}
 }</pre>
     </div>
   </section>
@@ -469,7 +472,7 @@
 
 <footer>
   <div class="wrap">
-    Accepted at <em>Learning to Listen: ICML 2026 Workshop on Machine Learning for Audio</em> (non-archival).<br>
+    LeAVJEPA &middot; Research preprint<br>
     Correspondence: <a href="mailto:benjamin.robson@aalto.fi">benjamin.robson@aalto.fi</a>
   </div>
 </footer>

@@ -48,7 +48,7 @@
       </div>
     </div>
     <svg class="ma-canvas" viewBox="0 0 1220 570" role="img" aria-labelledby="ma-title ma-desc">
-      <title id="ma-title">The complete AV-JEPA method, built from one guitar sample</title>
+      <title id="ma-title">The complete LeAVJEPA method, built from one guitar sample</title>
       <desc id="ma-desc">Frames and the spectrogram separate into patches. Two global views retain both modalities; two locals retain only audio or video. Each sequence starts with a labeled CLS token. A shared transformer repeats attention and MLP blocks, then its CLS output passes through the projector. Three stacked frames reveal temporal depth, with matching patches extending backward. Tubelets group patches from neighboring frame pairs. In the latent space, alignment brings views of one clip together. SIGReg compares characteristic functions of projected batches with the Gaussian target. The weighted losses update the shared encoder and projector.</desc>
       <defs>
         ${Array.from({length:3},(_,i)=>image(`guitar-frame-${i}.jpg`,0,0,168,168,`id="ma-frame-source-${i}"`)).join("")}
