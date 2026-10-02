@@ -1,4 +1,3 @@
-/* A single accumulating method diagram. Geometry is schematic, not inference. */
 "use strict";
 (() => {
   const root = document.getElementById("method-tour");
@@ -14,7 +13,6 @@
     [13000, "SIGReg"],
     [16000, "Update"],
   ];
-  // Markers land on readable states; the continuous slider still covers every frame.
   const stops = [0, 3500, 7000, 9600, 12300, 15000, duration];
   const text = (x, y, value, attrs = "") => `<text x="${x}" y="${y}" ${attrs}>${value}</text>`;
   const rect = (x, y, w, h, fill, attrs = "") => `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="4" fill="${fill}" ${attrs}/>`;
@@ -29,8 +27,6 @@
     { name: "Local · video", video: true, audio: false },
   ];
   const tokenStrip = (type, x) => Array.from({ length: 5 }, (_, k) => rect(x+k*12, 31, 8, 19, type === "video" ? V : A, 'class="ma-token"')).join("");
-  // Crop each tile from the same source, keeping every pixel as the tiles shrink
-  // and separate. Shared transforms animate the grid without rebuilding nodes.
   const patches = (source, columns, rows, width, height) => {
     const w = width / columns, h = height / rows;
     return Array.from({length: columns * rows}, (_, i) => {
@@ -41,7 +37,6 @@
   const tubeletCells = [[132,12],[144,72],[72,108]];
   const batch = Array.from({ length: 40 }, (_, i) => {
     const r = Math.sqrt(-2*Math.log((i+.5)/40)), angle = i*2.39996323;
-    // An illustrative, imperfect batch makes the tested discrepancy visible.
     return [.72*r*Math.cos(angle)+.45, 1.2*r*Math.sin(angle)-.25];
   });
   root.innerHTML = `
@@ -185,7 +180,6 @@
     const specs = [];
     const add = (id,d,start,end,arrow=true) => specs.push({id,d,start,end,arrow});
     if (small) {
-      // One top-to-bottom spine; labels have their own gap above each block.
       add("source-video","M94 235V276H185",3500,4200,false);
       add("source-audio","M276 169V276H185",3500,4200,false);
       add("source-view","M185 276V282",4000,4400);
@@ -196,7 +190,6 @@
       add("model-out","M185 980V1030",8900,10000);
       add("distribution","M185 1342V1360",13000,14000);
     } else {
-      // Every data edge moves forward along x; no return path for the losses.
       const [vx,vy] = point("video",194,98), [ax,ay] = point("audio",181,45);
       add("source-video",`M${vx+2} ${vy}H214`,3500,4300,false);
       add("source-audio",`M${ax+2} ${ay}H214`,3500,4300,false);
@@ -235,7 +228,6 @@
     opacity("tubelets",depth);
     tubeletVolumes.forEach(({x,y,paths})=>{
       const dx=12*depth,dy=-14*depth,size=9.36;
-      // Front faces stay on their patches as their edges extend backward.
       paths[0].setAttribute("d",`M${x} ${y}l${dx} ${dy}h${size}v${size}l${-dx} ${-dy}Z`);
       paths[1].setAttribute("d",`M${x} ${y}h${size}v${size}h-${size}Z M${x+size} ${y}l${dx} ${dy}`);
       paths[2].setAttribute("d",`M${x+dx} ${y+dy}l${dx} ${dy}h${size}v${size}l${-dx} ${-dy} M${x+dx+size} ${y+dy}l${dx} ${dy}`);
@@ -268,7 +260,6 @@
       connection.node.style.strokeDasharray="1";
       connection.node.style.strokeDashoffset=1-p;
       connection.node.style.opacity=p;
-      // Hide arrowheads until the connection reaches its destination.
       connection.node.style.markerEnd=p>.98&&connection.arrow?"url(#ma-arrow)":"none";
     });
     drawLosses(t);
@@ -277,7 +268,6 @@
       phase=nextPhase;
       root.querySelectorAll("[data-time]").forEach(button=>button.setAttribute("aria-current",String(Number(button.dataset.phase)===phase)));
     }
-    // Native dragging owns the thumb until release; playback must not fight it.
     if (!dragging) get("scrubber").value=String(t);
     get("scrubber").style.setProperty("--progress",`${t/duration*100}%`);
     get("scrubber").setAttribute("aria-valuetext",`${(t/1000).toFixed(1)} seconds of 18. ${stages[phase][1]}.`);
@@ -286,8 +276,6 @@
     get("play-icon").setAttribute("d",active?"M4 2H6V14H4ZM10 2H12V14H10Z":"M4 2L14 8L4 14Z");
     get("toggle").setAttribute("aria-label",active?"Pause animation":"Play animation");
   }
-  // Keep SVG nodes alive while animating; rebuilding the plots every frame
-  // caused unnecessary allocation and paint work alongside the timeline.
   function svgNode(tag, attributes, parent) {
     const node = document.createElementNS("http://www.w3.org/2000/svg",tag);
     Object.entries(attributes).forEach(([key,value]) => node.setAttribute(key,value));
@@ -308,8 +296,6 @@
     };
   });
   const axis = svgNode("line",{},get("batch-axis"));
-  // A distribution-level illustration of SIGReg's target, not its numerical
-  // characteristic-function test. Bins follow the same projected batch points.
   const bars=Array.from({length:16},(_,i)=>svgNode("rect",{x:i*180/16+.8,width:180/16-1.6,rx:2,fill:"#64748b",opacity:.75},get("histogram")));
   const projectionSamples=batch.map(()=>svgNode("circle",{cy:30,r:2,fill:R,opacity:.6},get("projection-samples")));
   get("gaussian").setAttribute("d",Array.from({length:65},(_,i)=>`${i?"L":"M"}${i*180/64},${176-Math.exp(-.5*(-3+i*6/64)**2)/Math.sqrt(2*Math.PI)*195}`).join(" "));
@@ -358,8 +344,6 @@
     lastTime=elapsed>=duration?null:now;
     render();resume();
   }
-  // Seeking preserves play intent, including seeking back after completion.
-  // Explicitly paused users remain paused; active playback resumes on release.
   function seek(value){stopFrame();elapsed=Math.max(0,Math.min(duration,value));render();resume();}
   function finishScrub(){
     if(!dragging)return;

@@ -1,4 +1,3 @@
-/* Method animation, adapted to the project page's native palette and typography. */
 .method-figure { width: min(1120px, calc(100vw - 48px)); margin-left: 50%; transform: translateX(-50%); }
 .method-tour { border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; background: var(--bg); }
 .method-tour button { font-family: inherit; color: var(--ink-2); cursor: pointer; }
