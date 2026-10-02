@@ -1,0 +1,26 @@
+{
+  "source": "assets/curation/MPe6ztPtF0Y_000030.mp4",
+  "source_sha256": "76a659355eced62d851a783ccd80921e771fb8fbb42768f9d22031a22e8cee38",
+  "window_seconds": [
+    1,
+    9
+  ],
+  "frame_seconds": [
+    1.0,
+    1.48,
+    1.96
+  ],
+  "sample_rate": 16000,
+  "n_fft": 400,
+  "hop_length": 160,
+  "mel_bands": 128,
+  "mel_scale": "HTK",
+  "window": "periodic Hamming",
+  "spectrogram_shape": [
+    128,
+    801
+  ],
+  "display_range_db": 80,
+  "note": "Source-derived still frames, waveform and log-mel spectrogram. Token sequences and latent geometry are illustrative. Waveform recolored to match the project page.",
+  "source_repository": "ml-thesis/codes/site-playground"
+}
