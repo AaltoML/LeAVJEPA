@@ -1,0 +1,8 @@
+{
+  "source": "ml-thesis/codes/site-playground/assets/data/atlas.js",
+  "source_sha256": "08c37053fbe3f5a57efb0666ed4db8cc442f69b18f49a274e9c4505e1197e0ad",
+  "panel": "vitl-pretrain-cls",
+  "projection": "tsne",
+  "upstream": "ml-thesis/codes/results/embedding_atlas/20260921/plots/coordinates.npz (sha256 8b8ef8a629712198b7212bf163428d37f34d3bccca343b3a9281ca1502425e8e)",
+  "note": "Pooled A/V/AV t-SNE, perplexity 50, seed 20260921; 1,474 VGGSound test clips, 30 classes. Coordinates rounded to 0.1. Families are consecutive groups of six classes, as in the playground."
+}
