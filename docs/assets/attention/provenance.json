@@ -1,0 +1,107 @@
+{
+  "selection": "User retained these eight examples on 2026-10-05. Oboe is the previously selected reference.",
+  "method": "Measured audio-to-video attention; 192 maps at 25Hz, native spatial patches, clip-wide fixed 99.5th-percentile color maximum. No temporal interpolation.",
+  "examples": [
+    {
+      "id": "AJw-x30L46E_000080",
+      "label": "Acoustic guitar",
+      "measured_source": "assets/attention-selected/dense/AJw-x30L46E_000080.js",
+      "source_sha256": "577b50cc12a95ae47f974a26a3c31a3d0b0c45f3c1d21067c44a2d0d7ff320e5",
+      "grid": 42,
+      "maps": 192,
+      "native_hw": [
+        720,
+        1280
+      ],
+      "window_shift_seconds": 0.0
+    },
+    {
+      "id": "c4r8Kd6Q1n8_000008",
+      "label": "Airplane 1",
+      "measured_source": "assets/attention-selected/dense/c4r8Kd6Q1n8_000008.js",
+      "source_sha256": "5939b82863f51ac5bad0b54f6a1be032c9787a9798ce3c0d652bc5f71f01f4cf",
+      "grid": 42,
+      "maps": 192,
+      "native_hw": [
+        720,
+        1270
+      ],
+      "window_shift_seconds": 1.2266875
+    },
+    {
+      "id": "ol8ZVX3qLQY_000106",
+      "label": "Airplane 2",
+      "measured_source": "assets/attention-selected/dense/ol8ZVX3qLQY_000106.js",
+      "source_sha256": "b73eab5ef1dfe67205fe4f6455a96f5394e5470675d3afdf8e0a58816b71f531",
+      "grid": 42,
+      "maps": 192,
+      "native_hw": [
+        720,
+        1280
+      ],
+      "window_shift_seconds": 0.22393400000000008
+    },
+    {
+      "id": "Ih0xy7tt2JY_000030",
+      "label": "Helicopter 1",
+      "measured_source": "assets/attention-selected/dense/Ih0xy7tt2JY_000030.js",
+      "source_sha256": "98c6c894b61439a304c5e9e93dcc29fefd7d9411434b2a85d67b74d112f77a07",
+      "grid": 42,
+      "maps": 192,
+      "native_hw": [
+        360,
+        480
+      ],
+      "window_shift_seconds": 0.0
+    },
+    {
+      "id": "9nsLTLNvOSw_000150",
+      "label": "Helicopter 2",
+      "measured_source": "assets/attention-selected/dense/9nsLTLNvOSw_000150.js",
+      "source_sha256": "e92ef6ecb4da8b790061f02554284530c54fc9577f9f2a5bbb664fdb326ec7cd",
+      "grid": 42,
+      "maps": 192,
+      "native_hw": [
+        720,
+        1280
+      ],
+      "window_shift_seconds": 0.0
+    },
+    {
+      "id": "6EIgJvYx4AE_000551",
+      "label": "Oboe",
+      "measured_source": "assets/attention-native/dense/6EIgJvYx4AE_000551.js",
+      "source_sha256": "7723274cf72db28f1e4ad2efc806c559718981a82edfeedfabd20595afe12f75",
+      "grid": 42,
+      "maps": 192,
+      "native_hw": null,
+      "window_shift_seconds": 0
+    },
+    {
+      "id": "M4rXhyyvERM_000040",
+      "label": "Piano",
+      "measured_source": "assets/attention-selected/dense/M4rXhyyvERM_000040.js",
+      "source_sha256": "38ef1ad5590c63d021822d27364fae0b7b870737eafa6b23d483c7bb4e12b0c9",
+      "grid": 42,
+      "maps": 192,
+      "native_hw": [
+        720,
+        1280
+      ],
+      "window_shift_seconds": 0.0
+    },
+    {
+      "id": "UY4v-zjlnlo_000010",
+      "label": "Violin",
+      "measured_source": "assets/attention-selected/dense/UY4v-zjlnlo_000010.js",
+      "source_sha256": "646cfe014d83a4496e739673eced93290e0d81ea6880b55255bfe040ffff32f5",
+      "grid": 42,
+      "maps": 192,
+      "native_hw": [
+        720,
+        1280
+      ],
+      "window_shift_seconds": 0.0
+    }
+  ]
+}
