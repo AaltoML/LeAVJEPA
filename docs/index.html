@@ -271,6 +271,8 @@
 <link rel="stylesheet" href="method.css">
 <link rel="stylesheet" href="paper.css">
 <script src="method.js" defer></script>
+<link rel="stylesheet" href="ablation.css">
+<script src="ablation.js" defer></script>
 <link rel="stylesheet" href="attention.css">
 <script src="assets/attention/index.js" defer></script>
 <script src="attention.js" defer></script>
@@ -340,7 +342,9 @@
       </div>
     </div>
     <figure>
-      <img class="zoomable" src="assets/fig_component_ablation.png" alt="VGGSound ablations: modality-specific local views give the highest linear and attentive probe accuracy; either alignment or SIGReg alone fails to learn useful features.">
+      <div id="ablation-chart">
+        <img class="zoomable" src="assets/fig_component_ablation.png" alt="VGGSound ablations: modality-specific local views give the highest linear and attentive probe accuracy; either alignment or SIGReg alone fails to learn useful features.">
+      </div>
       <figcaption><b>Modality-specific views improve cross-modal learning in LeAVJEPA.</b> Left: joint local views remain near the audio-only baselines (dashed lines). Random modality dropout improves probe accuracy, and making every local view audio-only or video-only yields the largest gain. Right: either loss term alone fails to learn useful features.</figcaption>
     </figure>
   </section>

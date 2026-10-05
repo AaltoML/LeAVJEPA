@@ -1,0 +1,20 @@
+.ab-legend { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 18px; font-size: 13px; color: var(--ink-2); margin-bottom: 10px; }
+.ab-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.ab-legend i { width: 12px; height: 12px; border-radius: 2px; }
+.ab-key-att { background: var(--accent); }
+.ab-key-lin { background: #94a3b8; }
+.ab-legend .ab-key-base { width: 18px; height: 0; border-radius: 0; border-top: 1.5px dashed var(--ink-3); }
+#ablation-chart svg { display: block; width: 100%; height: auto; }
+#ablation-chart text { font-family: inherit; }
+.ab-grid { stroke: var(--line); }
+.ab-axis { stroke: var(--ink-3); }
+.ab-t1 { fill: var(--ink); }
+.ab-t2 { fill: var(--ink-2); }
+.ab-t3 { fill: var(--ink-3); }
+.ab-att { fill: var(--accent); }
+.ab-lin { fill: #94a3b8; }
+.ab-att-line, .ab-lin-line { fill: none; stroke-width: 2; }
+.ab-att-line { stroke: var(--accent); }
+.ab-lin-line { stroke: #94a3b8; }
+.ab-base { stroke: var(--ink-3); stroke-width: 1.25; stroke-dasharray: 4 4; }
+.ab-mark { stroke: var(--bg); stroke-width: 2; }
