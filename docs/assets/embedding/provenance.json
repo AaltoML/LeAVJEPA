@@ -1,8 +1,17 @@
 {
-  "source": "ml-thesis/codes/site-playground/assets/data/atlas.js",
-  "source_sha256": "08c37053fbe3f5a57efb0666ed4db8cc442f69b18f49a274e9c4505e1197e0ad",
-  "panel": "vitl-pretrain-cls",
-  "projection": "tsne",
-  "upstream": "ml-thesis/codes/results/embedding_atlas/20260921/plots/coordinates.npz (sha256 8b8ef8a629712198b7212bf163428d37f34d3bccca343b3a9281ca1502425e8e)",
-  "note": "Pooled A/V/AV t-SNE, perplexity 50, seed 20260921; 1,474 VGGSound test clips, 30 classes. Coordinates rounded to 0.1. Families are consecutive groups of six classes, as in the playground."
+  "source": "ml-thesis/codes/results/embedding_atlas/20261005_site_tsne/out3/dof0.5.npz",
+  "source_sha256": "d1fe7be4ef59c34913afb8e143ef181deb07d2b42150a97fec12fd3c6916d5e6",
+  "script": "ml-thesis/codes/results/embedding_atlas/20261005_site_tsne/fit_dof.py",
+  "features": "ml-thesis/codes/results/embedding_atlas/20260921/features/vitl-pretrain.npz (sha256 b8660451c5e1475652e5188865fa6b471f1ecf7d6fa46cd9f42e3a6846e8d21c), [CLS] readout",
+  "settings": {
+    "method": "openTSNE",
+    "perplexity": 50,
+    "dof": 0.5,
+    "initialization": "pca",
+    "n_iter": 1500,
+    "seed": 20260921,
+    "preprocessing": "per-view L2, pooled randomized PCA50"
+  },
+  "joint_class_agreement_2d": 0.4188,
+  "note": "Pooled audio/video/joint fit; 1,474 VGGSound test clips, 30 classes. Coordinates rounded to 0.01. Families are consecutive groups of six classes."
 }
