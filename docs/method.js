@@ -53,7 +53,7 @@
       </defs>
       <g id="ma-connections" stroke="#a1a1aa" stroke-width="1.3" marker-end="url(#ma-arrow)"></g>
       <g id="ma-video">
-        ${text(96,-12,"Video",'id="ma-video-label" text-anchor="middle" class="ma-kicker" fill="'+V+'"')}
+        ${text(96,-12,"Video",'id="ma-video-label" text-anchor="middle" class="ma-kicker"')}
         ${[2,1,0].map(i=>`<g id="ma-frame-${i}" transform="translate(${i*12} ${28-i*14})" opacity="${1-i*.23}">
           ${rect(0,0,168,168,"white")}
           <g class="ma-frame-sheet"><use href="#ma-frame-source-${i}"/></g>

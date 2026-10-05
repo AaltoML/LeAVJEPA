@@ -1,24 +1,10 @@
 .attention-figure {
-  max-width: 620px;
-  margin: 24px auto 0;
+  margin: 24px 0 0;
   font-family: Helvetica, Arial, sans-serif;
 }
-.attention-toolbar { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
-.attention-toolbar label { font-size: 14px; color: var(--ink-2); }
-.attention-toolbar select {
-  margin-left: auto;
-  min-width: 190px;
-  max-width: 70%;
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  background: #fff;
-  padding: 8px 30px 8px 12px;
-  color: var(--ink);
-  font: inherit;
-  font-size: 14px;
-}
+.attention-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
 .attention-stage {
-  --reveal: 50%;
+  --reveal: 33%;
   position: relative;
   aspect-ratio: 1;
   width: 100%;
@@ -37,17 +23,17 @@
 .attention-stage canvas { clip-path: inset(0 0 0 var(--reveal)); }
 .attention-badge {
   position: absolute;
-  top: 12px;
-  padding: 3px 9px;
-  background: rgba(255,255,255,.92);
-  color: #18181b;
+  top: 10px;
+  padding: 1px 7px;
+  background: rgba(0,0,0,.3);
+  color: rgba(255,255,255,.8);
   border-radius: 4px;
-  font-size: 12px;
+  font-size: 11px;
   line-height: 1.6;
   pointer-events: none;
 }
-.attention-original { left: 12px; }
-.attention-heatmap { right: 12px; }
+.attention-original { left: 10px; }
+.attention-heatmap { right: 10px; }
 .attention-divider {
   position: absolute;
   inset: 0 auto 0 var(--reveal);
@@ -82,29 +68,32 @@
   cursor: col-resize;
   touch-action: pan-y;
 }
-.attention-stage:focus-within { outline: 2px solid var(--accent); outline-offset: 3px; }
-.attention-transport { display: flex; align-items: center; gap: 10px; margin-top: 14px; }
-.attention-transport button {
-  padding: 6px 11px;
-  border: 1px solid var(--line);
-  border-radius: 5px;
-  color: var(--ink);
-  background: #fff;
-  font: inherit;
-  font-size: 13px;
-  white-space: nowrap;
+.attention-stage:has(.attention-reveal:focus-visible) { outline: 2px solid var(--accent); outline-offset: 3px; }
+.attention-sound {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(0,0,0,.3);
+  color: rgba(255,255,255,.8);
   cursor: pointer;
 }
-.attention-transport button:hover { background: var(--bg-soft); }
-.attention-transport button:disabled { opacity: .45; cursor: wait; }
-.attention-transport input { flex: 1; width: 0; min-width: 40px; accent-color: var(--accent); }
-.attention-transport output { font-size: 12px; color: var(--ink-2); font-variant-numeric: tabular-nums; white-space: nowrap; }
-.attention-figure :is(button, select, input):focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.attention-sound:hover { background: rgba(0,0,0,.45); color: #fff; }
+.attention-sound svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.attention-sound .wave { display: none; }
+.attention-sound[aria-pressed="true"] .wave { display: inline; }
+.attention-sound[aria-pressed="true"] .mute { display: none; }
+.attention-sound:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .attention-status { margin: 9px 0 0; font-size: 12px; color: var(--ink-2); }
 .attention-status:empty { display: none; }
-.attention-figure figcaption { margin-top: 14px; }
-@media (max-width: 480px) {
-  .attention-transport { flex-wrap: wrap; gap: 8px; }
-  .attention-transport input { flex-basis: calc(100% - 108px); order: 2; }
-  .attention-transport output { order: 3; margin-left: auto; }
+.attention-figure figcaption { max-width: 832px; margin: 16px auto 0; text-align: center; }
+@media (max-width: 600px) {
+  .attention-grid { grid-template-columns: minmax(0, 1fr); max-width: 480px; margin: 0 auto; gap: 24px; }
 }

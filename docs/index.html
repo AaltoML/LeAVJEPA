@@ -55,6 +55,7 @@
   .authors span { white-space: nowrap; margin: 0 .4em; }
   .affil { color: var(--ink-2); font-size: 15.5px; margin: 0 0 28px; }
   .links { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-bottom: 14px; }
+  .also { font-size: 13.5px; color: var(--ink-2); margin: 0 0 14px; }
   .btn {
     display: inline-flex; align-items: center; gap: 8px;
     background: var(--ink); color: #fff;
@@ -287,7 +288,7 @@
   <p class="affil">ELLIS Institute Finland &amp; Aalto University</p>
 
   <div class="links">
-    <a class="btn" href="assets/leavjepa.pdf">
+    <a class="btn" href="https://arxiv.org/abs/XXXX.XXXXX">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>
       Paper
     </a>
@@ -300,6 +301,7 @@
       BibTeX
     </a>
   </div>
+  <p class="also">See also the <a href="https://arxiv.org/abs/2607.15295">workshop version</a> on arXiv.</p>
 
 
 </header>
@@ -340,6 +342,52 @@
     <figure>
       <img class="zoomable" src="assets/fig_component_ablation.png" alt="VGGSound ablations: modality-specific local views give the highest linear and attentive probe accuracy; either alignment or SIGReg alone fails to learn useful features.">
       <figcaption><b>Modality-specific views improve cross-modal learning in LeAVJEPA.</b> Left: joint local views remain near the audio-only baselines (dashed lines). Random modality dropout improves probe accuracy, and making every local view audio-only or video-only yields the largest gain. Right: either loss term alone fails to learn useful features.</figcaption>
+    </figure>
+  </section>
+
+  <section id="attention" aria-labelledby="attention-heading">
+    <h2 id="attention-heading">Audio–video attention</h2>
+    <figure class="attention-figure">
+      <div class="attention-grid">
+      <div class="attention-player" data-example="Airplane 1" aria-busy="true">
+        <div class="attention-stage" data-role="stage">
+          <video data-role="video" playsinline loop muted preload="metadata" aria-label="Original video with optional sound"></video>
+          <canvas data-role="map" width="672" height="672" role="img" aria-label="Audio-to-video attention heatmap"></canvas>
+          <span class="attention-badge attention-original" aria-hidden="true">Original</span>
+          <span class="attention-badge attention-heatmap" aria-hidden="true">Attention</span>
+          <div class="attention-divider" aria-hidden="true"><span>↔</span></div>
+          <input data-role="reveal" class="attention-reveal" type="range" min="0" max="100" value="33" step="1" aria-label="Reveal original video versus attention">
+          <button class="attention-sound" data-role="sound" type="button" aria-pressed="false" aria-label="Turn sound on"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z" fill="currentColor"/><path class="wave" d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/><path class="mute" d="m16 9 6 6m0-6-6 6"/></svg></button>
+        </div>
+        <p data-role="status" class="attention-status" role="status">Loading…</p>
+      </div>
+      <div class="attention-player" data-example="Oboe" aria-busy="true">
+        <div class="attention-stage" data-role="stage">
+          <video data-role="video" playsinline loop muted preload="metadata" aria-label="Original video with optional sound"></video>
+          <canvas data-role="map" width="672" height="672" role="img" aria-label="Audio-to-video attention heatmap"></canvas>
+          <span class="attention-badge attention-original" aria-hidden="true">Original</span>
+          <span class="attention-badge attention-heatmap" aria-hidden="true">Attention</span>
+          <div class="attention-divider" aria-hidden="true"><span>↔</span></div>
+          <input data-role="reveal" class="attention-reveal" type="range" min="0" max="100" value="50" step="1" aria-label="Reveal original video versus attention">
+          <button class="attention-sound" data-role="sound" type="button" aria-pressed="false" aria-label="Turn sound on"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z" fill="currentColor"/><path class="wave" d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/><path class="mute" d="m16 9 6 6m0-6-6 6"/></svg></button>
+        </div>
+        <p data-role="status" class="attention-status" role="status">Loading…</p>
+      </div>
+      <div class="attention-player" data-example="Helicopter 2" aria-busy="true">
+        <div class="attention-stage" data-role="stage">
+          <video data-role="video" playsinline loop muted preload="metadata" aria-label="Original video with optional sound"></video>
+          <canvas data-role="map" width="672" height="672" role="img" aria-label="Audio-to-video attention heatmap"></canvas>
+          <span class="attention-badge attention-original" aria-hidden="true">Original</span>
+          <span class="attention-badge attention-heatmap" aria-hidden="true">Attention</span>
+          <div class="attention-divider" aria-hidden="true"><span>↔</span></div>
+          <input data-role="reveal" class="attention-reveal" type="range" min="0" max="100" value="67" step="1" aria-label="Reveal original video versus attention">
+          <button class="attention-sound" data-role="sound" type="button" aria-pressed="false" aria-label="Turn sound on"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z" fill="currentColor"/><path class="wave" d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/><path class="mute" d="m16 9 6 6m0-6-6 6"/></svg></button>
+        </div>
+        <p data-role="status" class="attention-status" role="status">Loading…</p>
+      </div>
+      </div>
+      <figcaption><b>Audio-to-video attention follows the sound source.</b> Drag a divider to compare each clip with LeAVJEPA&#8217;s attention from audio to video patches. Brighter patches stay on the sound-producing object as it moves, without any localization supervision. The color scale is fixed within each clip.</figcaption>
+      <noscript><p>Enable JavaScript to compare the videos with their attention maps.</p></noscript>
     </figure>
   </section>
 
@@ -411,33 +459,6 @@
         </tbody>
       </table>
     </div>
-  </section>
-
-  <section id="attention" aria-labelledby="attention-heading">
-    <h2 id="attention-heading">Audio–video attention</h2>
-    <figure class="attention-figure" id="attention-viewer" aria-busy="true">
-      <div class="attention-toolbar">
-        <label for="attention-example">Sound class</label>
-        <select id="attention-example" aria-controls="attention-stage"></select>
-      </div>
-      <div class="attention-stage" id="attention-stage">
-        <video id="attention-video" playsinline loop muted preload="metadata" aria-label="Original video with optional sound"></video>
-        <canvas id="attention-map" width="672" height="672" role="img" aria-label="Audio-to-video attention heatmap"></canvas>
-        <span class="attention-badge attention-original" aria-hidden="true">Original</span>
-        <span class="attention-badge attention-heatmap" aria-hidden="true">Attention</span>
-        <div class="attention-divider" aria-hidden="true"><span>↔</span></div>
-        <input id="attention-reveal" class="attention-reveal" type="range" min="0" max="100" value="50" step="1" aria-label="Reveal original video versus attention">
-      </div>
-      <div class="attention-transport">
-        <button id="attention-play" type="button" disabled>Play</button>
-        <button id="attention-sound" type="button" aria-pressed="false">Sound on</button>
-        <input id="attention-time" type="range" min="0" max="191" value="0" step="1" aria-label="Video timeline" disabled>
-        <output id="attention-clock" for="attention-time">0:00.0 / 0:07.7</output>
-      </div>
-      <p id="attention-status" class="attention-status" role="status">Loading the selected example…</p>
-      <figcaption>Follow whether brighter patches stay with the sound-producing object as it moves. The color scale is fixed within each clip, so changes reveal how attention shifts over time.</figcaption>
-      <noscript><p>Enable JavaScript to compare the videos with their attention maps.</p></noscript>
-    </figure>
   </section>
 
   <section id="pca">
