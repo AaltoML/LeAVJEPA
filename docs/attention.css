@@ -93,7 +93,7 @@
 .attention-sound:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .attention-status { margin: 9px 0 0; font-size: 12px; color: var(--ink-2); }
 .attention-status:empty { display: none; }
-.attention-figure figcaption { max-width: 832px; margin: 16px auto 0; text-align: center; }
+.attention-figure figcaption { margin-top: 16px; }
 @media (max-width: 600px) {
   .attention-grid { grid-template-columns: minmax(0, 1fr); max-width: 480px; margin: 0 auto; gap: 24px; }
 }

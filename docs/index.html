@@ -45,7 +45,7 @@
   /* ---------- header ---------- */
   header.wrap { padding-top: 112px; padding-bottom: 8px; text-align: center; }
   h1 {
-    font-size: clamp(30px, 5vw, 46px);
+    font-size: clamp(29px, calc(5vw - 1px), 45px);
     line-height: 1.2;
     font-weight: 750;
     letter-spacing: -0.02em;
@@ -53,7 +53,8 @@
   }
   .authors { font-size: 17.5px; margin: 0 0 10px; }
   .authors span { white-space: nowrap; margin: 0 .4em; }
-  .affil { color: var(--ink-2); font-size: 15.5px; margin: 0 0 28px; }
+  .affil { color: var(--ink-2); font-size: 15.5px; margin: 0 0 4px; }
+  .contact { color: var(--ink-2); font-size: 14px; margin: 0 0 28px; }
   .links { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-bottom: 14px; }
   .also { font-size: 13.5px; color: var(--ink-2); margin: 0 0 14px; }
   .btn {
@@ -90,7 +91,7 @@
   .stat .label { font-size: 13px; color: var(--ink-2); margin-top: 4px; line-height: 1.4; }
 
   /* ---------- sections ---------- */
-  main { padding-bottom: 40px; }
+  main.wrap { padding-bottom: 120px; }
   section { margin-top: 72px; }
   h2 {
     font-size: 26px;
@@ -234,15 +235,6 @@
   }
   .copy-btn:hover { color: var(--ink); border-color: var(--ink-3); }
 
-  footer {
-    border-top: 1px solid var(--line);
-    margin-top: 80px;
-    padding: 28px 0 44px;
-    font-size: 14px;
-    color: var(--ink-2);
-    text-align: center;
-  }
-
   /* ---------- lightbox ---------- */
   #lightbox {
     position: fixed; inset: 0;
@@ -291,6 +283,7 @@
     <span><a href="https://users.aalto.fi/~asolin/">Arno Solin</a></span>
   </p>
   <p class="affil">ELLIS Institute Finland &amp; Aalto University</p>
+  <p class="contact">Correspondence: <a href="mailto:benjamin.robson@aalto.fi">benjamin.robson@aalto.fi</a></p>
 
   <div class="links">
     <a class="btn" href="https://arxiv.org/abs/XXXX.XXXXX">
@@ -306,7 +299,7 @@
       BibTeX
     </a>
   </div>
-  <p class="also">See also the <a href="https://arxiv.org/abs/2607.15295">workshop version</a> on arXiv.</p>
+  <p class="also">A preliminary workshop version of this work is available as <a href="https://arxiv.org/abs/2607.15295">arXiv:2607.15295</a>.</p>
 
 
 </header>
@@ -329,7 +322,7 @@
 
   <section id="method">
     <h2>How it works</h2>
-    <p>LeAVJEPA learns in latent space with one shared encoder and a symmetric objective. Modality dropout makes audio-only and video-only observations agree with a joint audio-video representation, without an EMA teacher, reconstruction decoder, cross-modal predictor, or contrastive negatives during pretraining.</p>
+    <p>LeAVJEPA learns in latent space with one shared encoder and a symmetric objective. Modality dropout aligns the embeddings of audio-only and video-only views with a joint audio-video representation, without an EMA teacher, reconstruction decoder, cross-modal predictor, or contrastive negatives during pretraining.</p>
     <div class="cards">
       <div class="card">
         <h3>One shared transformer</h3>
@@ -344,7 +337,7 @@
         <p>Mean-squared error aligns each view with the mean of the joint global embeddings. SIGReg regularizes the batch toward an isotropic Gaussian to prevent collapse. Both terms train the encoder and projector together.</p>
       </div>
     </div>
-    <figure>
+    <figure class="ablation-figure">
       <div id="ablation-chart">
         <img class="zoomable" src="assets/fig_component_ablation.png" alt="VGGSound ablations: modality-specific local views give the highest linear and attentive probe accuracy; either alignment or SIGReg alone fails to learn useful features.">
       </div>
@@ -393,7 +386,7 @@
         <p data-role="status" class="attention-status" role="status">Loading…</p>
       </div>
       </div>
-      <figcaption><b>Audio-to-video attention follows the sound source.</b> Drag a divider to compare each clip with LeAVJEPA&#8217;s attention from audio to video patches. Brighter patches stay on the sound-producing object as it moves, without any localization supervision. The color scale is fixed within each clip.</figcaption>
+      <figcaption><b>Audio-to-video attention follows the sound source.</b> Drag a divider to compare each clip with LeAVJEPA&#8217;s attention from audio to video patches. Brighter patches stay on the sound-producing object as it moves, without any localization supervision.</figcaption>
       <noscript><p>Enable JavaScript to compare the videos with their attention maps.</p></noscript>
     </figure>
   </section>
@@ -414,8 +407,8 @@
         <tbody>
           <tr><th scope="rowgroup" rowspan="4" class="encoder-group"><span>Shared encoder</span></th><th scope="row">MJEPA ViT-B<sup>*</sup> <span class="table-citation">(Teotia et al., 2026)</span></th><td>86M</td><td>AS</td><td class="num">37.54</td><td class="num">20.18</td><td class="num">40.68</td><td class="num">–</td></tr>
           <tr><th scope="row">MJEPA ViT-L <span class="table-citation">(Teotia et al., 2026)</span></th><td>300M</td><td>AS</td><td class="num"><strong>38.89</strong></td><td class="num"><strong>25.38</strong></td><td class="num"><strong>42.90</strong></td><td class="num"><strong>95.2</strong></td></tr>
-          <tr><th scope="row">LeAVJEPA ViT-B (ours)</th><td>87M</td><td>AS</td><td class="num">27.79</td><td class="num">14.82</td><td class="num">30.98</td><td class="num">88.0</td></tr>
-          <tr><th scope="row">LeAVJEPA ViT-L (ours)</th><td>304M</td><td>AS</td><td class="num">31.56</td><td class="num">18.25</td><td class="num">36.03</td><td class="num">91.3</td></tr>
+          <tr class="ours"><th scope="row">LeAVJEPA ViT-B (ours)</th><td>87M</td><td>AS</td><td class="num">27.79</td><td class="num">14.82</td><td class="num">30.98</td><td class="num">88.0</td></tr>
+          <tr class="ours"><th scope="row">LeAVJEPA ViT-L (ours)</th><td>304M</td><td>AS</td><td class="num">31.56</td><td class="num">18.25</td><td class="num">36.03</td><td class="num">91.3</td></tr>
         </tbody>
       </table>
     </div>
@@ -435,9 +428,9 @@
           <tr><th scope="row">MJEPA ViT-L<sup>†</sup> <span class="table-citation">(Teotia et al., 2026)</span></th><td class="num">29.3</td><td class="num"><strong>53.7</strong></td><td class="num">61.8</td><td class="num">30.6</td><td class="num">53.4</td><td class="num">61.3</td></tr>
         </tbody>
         <tbody>
-          <tr><th scope="row">LeAVJEPA ViT-B (ours)</th><td class="num">10.5</td><td class="num">28.9</td><td class="num">36.6</td><td class="num">11.4</td><td class="num">28.2</td><td class="num">36.8</td></tr>
-          <tr><th scope="row">LeAVJEPA ViT-L (ours)</th><td class="num">19.1</td><td class="num">40.5</td><td class="num">50.4</td><td class="num">18.7</td><td class="num">42.1</td><td class="num">51.9</td></tr>
-          <tr><th scope="row">LeAVJEPA ViT-L + InfoNCE head<sup>‡</sup> (ours)</th><td class="num">24.4</td><td class="num">46.9</td><td class="num">57.7</td><td class="num">25.6</td><td class="num">48.0</td><td class="num">57.1</td></tr>
+          <tr class="ours"><th scope="row">LeAVJEPA ViT-B (ours)</th><td class="num">10.5</td><td class="num">28.9</td><td class="num">36.6</td><td class="num">11.4</td><td class="num">28.2</td><td class="num">36.8</td></tr>
+          <tr class="ours"><th scope="row">LeAVJEPA ViT-L (ours)</th><td class="num">19.1</td><td class="num">40.5</td><td class="num">50.4</td><td class="num">18.7</td><td class="num">42.1</td><td class="num">51.9</td></tr>
+          <tr class="ours"><th scope="row">LeAVJEPA ViT-L + InfoNCE head<sup>‡</sup> (ours)</th><td class="num">24.4</td><td class="num">46.9</td><td class="num">57.7</td><td class="num">25.6</td><td class="num">48.0</td><td class="num">57.1</td></tr>
         </tbody>
       </table>
     </div>
@@ -459,10 +452,10 @@
           <tr><th scope="row">EquiAV <span class="table-citation">(Kim et al., 2024)</span></th><td class="num">172M</td><td>IN-SSL</td><td>AS-2M</td><td class="num"><strong>67.1</strong></td></tr>
         </tbody>
         <tbody>
-          <tr><th scope="row">LeAVJEPA (Linear)</th><td class="num">87M</td><td>–</td><td>AS-2M</td><td class="num">58.3</td></tr>
-          <tr><th scope="row">LeAVJEPA (Attentive)</th><td class="num">87M</td><td>–</td><td>AS-2M</td><td class="num">60.4</td></tr>
-          <tr><th scope="row">LeAVJEPA (Linear)</th><td class="num">304M</td><td>–</td><td>AS-2M</td><td class="num">59.9</td></tr>
-          <tr><th scope="row">LeAVJEPA (Attentive)</th><td class="num">304M</td><td>–</td><td>AS-2M</td><td class="num"><strong>61.1</strong></td></tr>
+          <tr class="ours"><th scope="row">LeAVJEPA (Linear)</th><td class="num">87M</td><td>–</td><td>AS-2M</td><td class="num">58.3</td></tr>
+          <tr class="ours"><th scope="row">LeAVJEPA (Attentive)</th><td class="num">87M</td><td>–</td><td>AS-2M</td><td class="num">60.4</td></tr>
+          <tr class="ours"><th scope="row">LeAVJEPA (Linear)</th><td class="num">304M</td><td>–</td><td>AS-2M</td><td class="num">59.9</td></tr>
+          <tr class="ours"><th scope="row">LeAVJEPA (Attentive)</th><td class="num">304M</td><td>–</td><td>AS-2M</td><td class="num"><strong>61.1</strong></td></tr>
         </tbody>
       </table>
     </div>
@@ -504,13 +497,6 @@
   </section>
 
 </main>
-
-<footer>
-  <div class="wrap">
-    LeAVJEPA &middot; Research preprint<br>
-    Correspondence: <a href="mailto:benjamin.robson@aalto.fi">benjamin.robson@aalto.fi</a>
-  </div>
-</footer>
 
 <div id="lightbox" role="dialog" aria-modal="true" aria-label="Enlarged figure" onclick="this.classList.remove('open')"><img alt=""></div>
 

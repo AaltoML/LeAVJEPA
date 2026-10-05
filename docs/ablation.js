@@ -33,16 +33,16 @@
   const render = () => {
     const W = Math.max(320, root.clientWidth), narrow = W < 560;
     const H = narrow ? 300 : 320, m = { t: 26, b: narrow ? 44 : 50, l: 30, r: 4 }, gap = 28;
-    const pw = W - m.l - m.r - gap, w1 = pw * 5 / 8, w2 = pw * 3 / 8;
+    const pw = W - m.l - m.r - gap, w1 = pw * (narrow ? 5 / 8 : .72), w2 = pw - w1;
     const ph = H - m.t - m.b, Y = v => m.t + ph * (1 - v / max);
     const panels = [{ x0: m.l, w: w1, data: views, line: true }, { x0: m.l + w1 + gap, w: w2, data: losses }];
     let s = "";
     ticks.forEach(t => s += text(m.l - 7, Y(t) + 4, t, 'text-anchor="end" font-size="11" class="ab-t3"'));
     panels.forEach(p => {
-      const bw = p.w / p.data.length, X = i => p.x0 + bw * (i + .5), fs = narrow ? 10.5 : 12;
+      const bw = p.w / p.data.length, X = i => p.x0 + bw * (i + .5), fs = narrow ? 10.5 : 12, short = narrow || bw < 95;
       ticks.forEach(t => s += `<line x1="${p.x0}" x2="${p.x0 + p.w}" y1="${Y(t)}" y2="${Y(t)}" class="${t ? "ab-grid" : "ab-axis"}"/>`);
       p.data.forEach((d, i) => {
-        s += text(X(i), H - m.b + 18, narrow ? d.short : d.name, `text-anchor="middle" font-size="${fs}" font-weight="${d.ours ? 700 : 400}" class="ab-t1"`);
+        s += text(X(i), H - m.b + 18, short ? d.short : d.name, `text-anchor="middle" font-size="${fs}" font-weight="${d.ours ? 700 : 400}" class="ab-t1"`);
         s += text(X(i), H - m.b + 33, d.sub, `text-anchor="middle" font-size="${fs - 1}" class="ab-t3"`);
       });
       if (!p.line) { s += p.data.map((d, i) => bars(X(i), d, Y, bw, narrow ? 9.5 : 11)).join(""); return; }
@@ -53,16 +53,21 @@
       const vs = narrow ? 10.5 : 11.5;
       p.data.forEach((d, i) => {
         s += `<circle cx="${X(i)}" cy="${Y(d.lin)}" r="4.5" class="ab-lin ab-mark"/><circle cx="${X(i)}" cy="${Y(d.att)}" r="4.5" class="ab-att ab-mark"/>`;
-        s += text(X(i), Y(d.att) - 10, fmt(d.att), `text-anchor="middle" font-size="${vs}" class="ab-t1"`);
-        s += text(X(i), Y(d.lin) + 18, fmt(d.lin), `text-anchor="middle" font-size="${vs}" class="ab-t2"`);
+        s += text(X(i), Y(d.att) - 10, fmt(d.att), `text-anchor="middle" font-size="${vs}" class="ab-t1 ab-halo"`);
+        s += text(X(i), Y(d.lin) + 18, fmt(d.lin), `text-anchor="middle" font-size="${vs}" class="ab-t2 ab-halo"`);
       });
     });
+    const lx = m.l + 10, ly = m.t + 8, lf = narrow ? 10.5 : 12, row = narrow ? 15 : 17;
+    s += `<rect x="${lx - 6}" y="${ly - 5}" width="${narrow ? 128 : 150}" height="${row * 2 + 4}" class="ab-legend-bg"/>`;
+    [["Attentive probe", `<rect x="${lx}" y="${ly}" width="10" height="10" rx="2" class="ab-att"/>`],
+     ["Linear probe", `<rect x="${lx}" y="${ly + row}" width="10" height="10" rx="2" class="ab-lin"/>`]]
+      .forEach(([label, key], i) => s += key + text(lx + 18, ly + row * i + 9.5, label, `font-size="${lf}" class="ab-t2 ab-halo"`));
+    s += text(panels[0].x0 + panels[0].w - 4, Y(audioOnly.lin) + 15, "Audio-only pretraining", `text-anchor="end" font-size="${narrow ? 10 : 11}" class="ab-t3 ab-halo"`);
     s += text(m.l, 11, "Local-view design", 'font-size="12" font-weight="700" class="ab-t2"');
     s += text(panels[1].x0, 11, "Loss terms", 'font-size="12" font-weight="700" class="ab-t2"');
     root.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="VGGSound top-1 accuracy. Local-view design, attentive and linear probe: no local views 23.2 and 10.3; joint local views 24.7 and 13.7; masked local views 34.1 and 23.1; random modality dropout 41.3 and 38.1; modality-specific views (LeAVJEPA) 47.1 and 43.9. Loss terms: invariance only 1.1 and 1.2; SIGReg only 1.2 and 0.3; both 47.1 and 43.9.">${s}</svg>`;
   };
 
-  root.insertAdjacentHTML("beforebegin", '<div class="ab-legend" aria-hidden="true"><span><i class="ab-key-att"></i>Attentive probe</span><span><i class="ab-key-lin"></i>Linear probe</span><span><i class="ab-key-base"></i>Audio-only pretraining</span></div>');
   let width = 0;
   new ResizeObserver(() => { if (root.clientWidth !== width) { width = root.clientWidth; render(); } }).observe(root);
   render();
