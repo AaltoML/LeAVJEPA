@@ -24,7 +24,6 @@
 .ma-canvas .ma-cls-label { font-size: 13px; font-weight: 600; fill: var(--accent); }
 .ma-canvas .ma-block-label { font-size: 16px; }
 .ma-patch { transform: scale(var(--patch-x, 1), var(--patch-y, 1)); }
-.method-figure figcaption { max-width: 832px; margin: 12px auto 0; text-align: center; }
 #results tbody th, #retrieval tbody th { font-size: inherit; font-weight: 500; color: var(--ink); }
 #results .table-scroll + .table-scroll { margin-top: 36px; }
 .table-scroll:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }

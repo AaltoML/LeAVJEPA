@@ -34,8 +34,6 @@
         <div class="em-legend">${data.families.map((f, i) => `<span><i style="background:${colors[i]}"></i>${f}</span>`).join("")}</div>
       </div>
     </div>`;
-  const caption = root.closest("figure")?.querySelector("figcaption");
-  if (caption) root.append(caption);
   const canvas = root.querySelector("canvas"), ctx = canvas.getContext("2d"), tip = root.querySelector(".em-tip");
 
   // Fixed bounds over all modalities, so toggling never moves points.
