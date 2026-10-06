@@ -29,12 +29,15 @@
     const get = (role) => root.querySelector(`[data-role="${role}"]`);
     const video = get("video"), canvas = get("map"), context = canvas.getContext("2d");
     const tile = document.createElement("canvas"), tileContext = tile.getContext("2d");
+    const earlyLoop = navigator.vendor === "Apple Computer, Inc.";
     let clip, weights, version = 0, frame = -1, ready = false, visible = false;
+    let animationRequest = 0;
     video.muted = true;
 
     function draw(mediaTime = video.currentTime) {
       if (!clip || !ready) return;
-      const time = mediaTime + clip.sourceOffset;
+      // Firefox's frame timestamps can keep increasing across native loops.
+      const time = (mediaTime % clip.duration) + clip.sourceOffset;
       let next = 0;
       for (let i = 1; i < clip.frames; i++)
         if (Math.abs(clip.times[i] - time) < Math.abs(clip.times[next] - time)) next = i;
@@ -59,6 +62,26 @@
     }
     function start() {
       if (ready && visible && !document.hidden) video.play().catch(() => {});
+    }
+    function updatePlayback() {
+      animationRequest = 0;
+      if (!ready || video.paused || !visible || document.hidden) return;
+      // Seek in the last half-frame to avoid Safari's end-of-stream restart stall.
+      // Native looping remains the fallback if a busy/background tab misses this window.
+      if (earlyLoop && video.loop && !video.seeking && Number.isFinite(video.duration)
+          && video.currentTime >= video.duration - clip.duration / clip.frames / 2) {
+        video.currentTime = 0;
+      }
+      if (!video.requestVideoFrameCallback && !video.seeking) draw();
+      animationRequest = requestAnimationFrame(updatePlayback);
+    }
+    function trackPlayback() {
+      if ((earlyLoop || !video.requestVideoFrameCallback) && !animationRequest)
+        animationRequest = requestAnimationFrame(updatePlayback);
+    }
+    function stopTracking() {
+      cancelAnimationFrame(animationRequest);
+      animationRequest = 0;
     }
     async function choose(id) {
       const request = ++version, example = examples.find((item) => item.id === id);
@@ -98,12 +121,12 @@
     });
     video.addEventListener("seeked", () => draw());
     video.addEventListener("volumechange", controls);
+    video.addEventListener("playing", trackPlayback);
+    video.addEventListener("pause", stopTracking);
+    video.addEventListener("emptied", stopTracking);
     if (video.requestVideoFrameCallback) {
       const update = (_, metadata) => { draw(metadata.mediaTime); video.requestVideoFrameCallback(update); };
       video.requestVideoFrameCallback(update);
-    } else {
-      const update = () => { if (!video.paused) draw(); requestAnimationFrame(update); };
-      requestAnimationFrame(update);
     }
     get("sound").addEventListener("click", () => {
       video.muted = !video.muted;
