@@ -1,0 +1,48 @@
+#!/bin/bash
+#SBATCH --job-name=probe-as20k
+#SBATCH --time=2-00:00:00
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=1
+#SBATCH --gpus-per-node=1
+#SBATCH --cpus-per-task=16
+#SBATCH --mem=224G
+#SBATCH -o slurm_logs/%j_probe-as20k.out
+#SBATCH -e slurm_logs/%j_probe-as20k.err
+
+set -euo pipefail
+source env.sh
+
+CKPT="${CKPT:?set CKPT=/path/to/pretrain.ckpt}"
+VIT="${VIT:-base}"
+NAME="${NAME:-$(basename "$CKPT" .ckpt)}"
+
+for MOD in av audio video; do
+  CACHE="$OUTPUT_ROOT/as20k_probe/${VIT}_${NAME}_${MOD}"
+  echo "=== modality=$MOD cache=$CACHE"
+
+  srun python ../token_probe.py --mode extract \
+    --pretrained_checkpoint "$CKPT" --vit_size "$VIT" --modality "$MOD" \
+    --dataset audioset_20k --cache_dir "$CACHE" \
+    --train_views 2 --part_size 1024 --batch_size 32 --num_workers 16 --overwrite
+
+  srun python ../token_probe.py --mode fit \
+    --cache_dir "$CACHE" --dataset audioset_20k \
+    --depth 4 --fit_lr 3e-4 --fit_wd 1e-4 --fit_epochs 40 --fit_batch 128 \
+    --val_frac 0.2 --fit_log_every 5
+
+  srun python ../token_probe.py --mode test \
+    --pretrained_checkpoint "$CKPT" --vit_size "$VIT" --modality "$MOD" \
+    --dataset audioset_20k --cache_dir "$CACHE" \
+    --depth 4 --fit_lr 3e-4 --fit_wd 1e-4 \
+    --num_eval_clips 4 --batch_size 16 --num_workers_test 8
+
+  rm -f "$CACHE"/train_v*_p*.pt
+done
+
+python - "$OUTPUT_ROOT/as20k_probe" "${VIT}_${NAME}" <<'PY'
+import json, sys
+root, tag = sys.argv[1:]
+for mod in ("audio", "video", "av"):
+    r = json.load(open(f"{root}/{tag}_{mod}/test_results.json"))
+    print(f"AS-20K {mod:>5s} mAP = {r['test_map'] * 100:.2f}")
+PY

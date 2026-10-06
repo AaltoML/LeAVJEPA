@@ -1,0 +1,35 @@
+#!/bin/bash
+#SBATCH --job-name=ft-as20k-vitb
+#SBATCH --time=1-00:00:00
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=2
+#SBATCH --gpus-per-node=2
+#SBATCH --cpus-per-task=8
+#SBATCH --mem-per-cpu=12g
+#SBATCH -o slurm_logs/%j_ft-as20k-vitb.out
+#SBATCH -e slurm_logs/%j_ft-as20k-vitb.err
+
+source env.sh
+: "${CKPT:?set CKPT=/path/to/pretraining.ckpt}"
+
+srun python ../finetune.py \
+  --pretrained_checkpoint "$CKPT" \
+  --dataset audioset_20k \
+  --vit_size base \
+  --lr 5e-4 \
+  --backbone_lr_scale 0.1 \
+  --weight_decay 5e-2 \
+  --warmup_fraction 0.1 \
+  --label_smoothing 0.0 \
+  --mixup_alpha 0.5 \
+  --batch_size 128 \
+  --num_gpus 2 \
+  --epochs 50 \
+  --num_frames 16 \
+  --frame_size 224 \
+  --gradient_checkpointing \
+  --num_workers 6 \
+  --num_workers_test 4 \
+  --skip_val \
+  --run_test \
+  --checkpoint_dir "$OUTPUT_ROOT/checkpoints"

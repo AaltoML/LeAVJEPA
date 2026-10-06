@@ -1,0 +1,24 @@
+#!/bin/bash
+#SBATCH --job-name=retrieval-infonce-head
+#SBATCH --time=24:00:00
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=1
+#SBATCH --gpus-per-node=1
+#SBATCH --cpus-per-task=16
+#SBATCH --mem=128G
+#SBATCH -o slurm_logs/%j_retrieval-infonce-head.out
+#SBATCH -e slurm_logs/%j_retrieval-infonce-head.err
+
+set -euo pipefail
+source env.sh
+CKPT="${CKPT:?set CKPT=/path/to/pretrain.ckpt}"
+OUT="$OUTPUT_ROOT/retrieval_head/$(basename "$CKPT" .ckpt)"
+
+srun python ../retrieval_head.py \
+  --checkpoint_path "$CKPT" \
+  --train_per_class 300 \
+  --train_clips 2 \
+  --eval_clips 4 \
+  --batch_size 32 \
+  --num_workers 16 \
+  --output_dir "$OUT"

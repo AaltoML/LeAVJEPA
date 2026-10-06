@@ -1,0 +1,32 @@
+#!/bin/bash
+#SBATCH --job-name=esc50-finetune
+#SBATCH --time=12:00:00
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=1
+#SBATCH --gpus-per-node=1
+#SBATCH --cpus-per-task=8
+#SBATCH --mem=64G
+#SBATCH -o slurm_logs/%j_esc50-finetune.out
+#SBATCH -e slurm_logs/%j_esc50-finetune.err
+
+set -euo pipefail
+source env.sh
+CKPT="${CKPT:?set CKPT=/path/to/pretraining checkpoint}"
+VIT="${VIT:-base}"
+OUT="$OUTPUT_ROOT/esc50/finetune_${VIT}.json"
+
+srun python ../esc50_finetune.py \
+  --checkpoint_path "$CKPT" \
+  --vit_size "$VIT" \
+  --esc50_root "$ESC50_ROOT" \
+  --epochs 60 \
+  --batch_size 48 \
+  --lr 1e-3 \
+  --backbone_lr_scale 0.1 \
+  --mixup_alpha 0.5 \
+  --freq_mask_param 48 \
+  --time_mask_param 150 \
+  --num_workers 8 \
+  --seed 0 \
+  ${EXTRA:-} \
+  --out "$OUT"

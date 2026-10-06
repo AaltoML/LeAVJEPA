@@ -18,11 +18,14 @@ class DatasetConfig:
     csv_format: str
 
 
-AUDIOSET_DATA = os.environ.get("AUDIOSET_DIR", "./data/AudioSet")
+AUDIOSET_DATA = os.environ.get("AUDIOSET_ROOT", "data/AudioSet")
+VGGSOUND_DATA = os.environ.get("VGGSOUND_ROOT", "data/VGGSound")
+
 AUDIOSET_TARS = f"{AUDIOSET_DATA}/shards/data_{{000..453}}.tar"
 AUDIOSET_TARS_256 = f"{AUDIOSET_DATA}/shards_256/data_{{000..453}}.tar"
 
-VGGSOUND_DATA = os.environ.get("VGGSOUND_DIR", "./data/VGGSound")
+
+AUDIOSET_SPEC = dict(spec_mean=-17.977254, spec_std=24.468409)
 
 DATASETS = {
     "vggsound": DatasetConfig(
@@ -32,7 +35,7 @@ DATASETS = {
         train_tar=f"{VGGSOUND_DATA}/train_tars/vggsound_train_{{00..71}}.tar",
         train_csv=f"{VGGSOUND_DATA}/train.csv",
         train_size=183_730,
-        test_tar=f"{VGGSOUND_DATA}/test_tars/vggsound_test_{{00..03}}.tar",
+        test_tar=f"{VGGSOUND_DATA}/test_tars/vggsound_test_{{00..07}}.tar",
         test_csv=f"{VGGSOUND_DATA}/test.csv",
         test_size=15_446,
         spec_mean=-20.437003,
@@ -46,7 +49,7 @@ DATASETS = {
         train_tar=f"{VGGSOUND_DATA}/train_tars_256/vggsound_train_{{00..71}}.tar",
         train_csv=f"{VGGSOUND_DATA}/train.csv",
         train_size=183_730,
-        test_tar=f"{VGGSOUND_DATA}/test_tars_256/vggsound_test_{{00..03}}.tar",
+        test_tar=f"{VGGSOUND_DATA}/test_tars_256/vggsound_test_{{00..07}}.tar",
         test_csv=f"{VGGSOUND_DATA}/test.csv",
         test_size=15_446,
         spec_mean=-17.689175,
@@ -63,9 +66,8 @@ DATASETS = {
         test_tar=AUDIOSET_TARS,
         test_csv=f"{AUDIOSET_DATA}/eval_segments.csv",
         test_size=20_371,
-        spec_mean=-17.977254,
-        spec_std=24.468409,
         csv_format="audioset",
+        **AUDIOSET_SPEC,
     ),
     "audioset_256": DatasetConfig(
         name="audioset_256",
@@ -77,9 +79,8 @@ DATASETS = {
         test_tar=AUDIOSET_TARS_256,
         test_csv=f"{AUDIOSET_DATA}/eval_segments.csv",
         test_size=20_371,
-        spec_mean=-17.977254,
-        spec_std=24.468409,
         csv_format="audioset",
+        **AUDIOSET_SPEC,
     ),
     "audioset_20k": DatasetConfig(
         name="audioset_20k",
@@ -91,8 +92,7 @@ DATASETS = {
         test_tar=AUDIOSET_TARS,
         test_csv=f"{AUDIOSET_DATA}/eval_segments.csv",
         test_size=20_371,
-        spec_mean=-17.977254,
-        spec_std=24.468409,
         csv_format="audioset",
+        **AUDIOSET_SPEC,
     ),
 }

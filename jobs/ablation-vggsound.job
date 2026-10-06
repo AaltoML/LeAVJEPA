@@ -1,0 +1,57 @@
+#!/bin/bash
+#SBATCH --job-name=ablation-vggsound
+#SBATCH --time=3-00:00:00
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=1
+#SBATCH --gpus-per-node=1
+#SBATCH --cpus-per-task=16
+#SBATCH --mem-per-cpu=16g
+#SBATCH -o slurm_logs/%j_ablation-vggsound.out
+#SBATCH -e slurm_logs/%j_ablation-vggsound.err
+
+source env.sh
+: "${ARM:?set ARM (ours|inv-only|sigreg-only|no-local|joint|masked|random-drop|audio-only)}"
+LAMBD=0.05
+K=2
+case "$ARM" in
+  ours)        ARM_FLAGS="--cross_modal" ;;
+  inv-only)    ARM_FLAGS="--cross_modal"; LAMBD=0.0 ;;
+  sigreg-only) ARM_FLAGS="--cross_modal"; LAMBD=1.0 ;;
+  no-local)    ARM_FLAGS="--modality_drop 0.0 --video_mask 0.0 --audio_mask 0.0"; K=0 ;;
+  joint)       ARM_FLAGS="--modality_drop 0.0 --video_mask 0.0 --audio_mask 0.0" ;;
+  masked)      ARM_FLAGS="--modality_drop 0.0 --video_mask 0.8 --audio_mask 0.5" ;;
+  random-drop) ARM_FLAGS="--modality_drop 0.5 --video_mask 0.0 --audio_mask 0.0" ;;
+  audio-only)  ARM_FLAGS="--audio_only --modality_drop 0.0 --audio_mask 0.0" ;;
+  *) echo "unknown ARM=$ARM"; exit 2 ;;
+esac
+export ECHO_DISABLE_DDP_OPTIMIZER=1
+
+srun python ../train.py \
+  --dataset vggsound_256 \
+  --vit_size base \
+  --lr 5e-4 \
+  --lambd "$LAMBD" \
+  --num_global_views 2 \
+  --num_local_views "$K" \
+  --batch_size 64 \
+  --accum_steps 8 \
+  --num_gpus 1 \
+  --num_workers 14 \
+  --prefetch_factor 1 \
+  --num_frames 16 \
+  --frame_size 224 \
+  --epochs 50 \
+  --proj_dim 128 \
+  --probe_lr 1e-3 \
+  --probe_weight_decay 0.0 \
+  --attentive_probe \
+  --wd_exclude_norm_embed \
+  --gradient_checkpointing \
+  --seed 0 \
+  --ckpt_every_n_epochs 1 \
+  --ckpt_keep_last 1 \
+  --eval_every_n_epochs 10 \
+  --run_test \
+  --checkpoint_dir "$OUTPUT_ROOT/checkpoints/ablation-$ARM" \
+  --run_name "ablation-$ARM" \
+  $ARM_FLAGS

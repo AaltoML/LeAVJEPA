@@ -1,0 +1,43 @@
+#!/bin/bash
+#SBATCH --job-name=pretrain-as-vitb
+#SBATCH --time=4-00:00:00
+#SBATCH --signal=B:USR1@900
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=8
+#SBATCH --gpus-per-node=8
+#SBATCH --cpus-per-task=16
+#SBATCH --mem=0
+#SBATCH -o slurm_logs/%j_pretrain-as-vitb.out
+#SBATCH -e slurm_logs/%j_pretrain-as-vitb.err
+
+source env.sh
+RUN=pretrain-as-vitb
+source chain.sh "$RUN" "pretrain-audioset-vitb.job"
+
+srun python ../train.py \
+  --dataset audioset_256 \
+  --vit_size base \
+  --cross_modal \
+  --unimodal_token_drop \
+  --num_global_views 2 \
+  --num_local_views 2 \
+  --lambd 0.05 \
+  --lr 5e-4 \
+  --wd_exclude_norm_embed \
+  --epochs 50 \
+  --batch_size 64 \
+  --num_gpus 8 \
+  --num_workers 15 \
+  --prefetch_factor 1 \
+  --num_frames 16 \
+  --frame_size 224 \
+  --proj_dim 128 \
+  --gradient_checkpointing \
+  --no_probe \
+  --seed 0 \
+  --ckpt_every_n_epochs 1 \
+  --checkpoint_dir "$CHAIN_DIR" \
+  --run_name "$RUN" \
+  --wandb_id "$RUN" \
+  $RESUME_FLAG &
+chain_wait

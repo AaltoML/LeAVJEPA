@@ -1,0 +1,38 @@
+#!/bin/bash
+#SBATCH --job-name=ft-vggs-vitl
+#SBATCH --time=1-00:00:00
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=8
+#SBATCH --gpus-per-node=8
+#SBATCH --cpus-per-task=16
+#SBATCH --mem-per-cpu=12g
+#SBATCH -o slurm_logs/%j_ft-vggs-vitl.out
+#SBATCH -e slurm_logs/%j_ft-vggs-vitl.err
+
+source env.sh
+: "${CKPT:?set CKPT=/path/to/pretraining.ckpt}"
+
+srun python ../finetune.py \
+  --pretrained_checkpoint "$CKPT" \
+  --dataset vggsound \
+  --vit_size large \
+  --lr 2e-4 \
+  --backbone_lr_scale 0.1 \
+  --batch_size 40 \
+  --num_gpus 8 \
+  --epochs 20 \
+  --num_frames 16 \
+  --frame_size 224 \
+  --freq_mask_param 24 \
+  --time_mask_param 80 \
+  --mixup_alpha 0.2 \
+  --random_resized_crop \
+  --rrc_min_scale 0.5 \
+  --attentive_probe \
+  --gradient_checkpointing \
+  --num_workers 9 \
+  --num_workers_test 2 \
+  --num_eval_clips 6 \
+  --val_every_n_epochs 10 \
+  --run_test \
+  --checkpoint_dir "$OUTPUT_ROOT/checkpoints"

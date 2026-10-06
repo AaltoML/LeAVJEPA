@@ -1,0 +1,47 @@
+#!/bin/bash
+#SBATCH --job-name=sensitivity-vggsound
+#SBATCH --time=3-00:00:00
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=1
+#SBATCH --gpus-per-node=1
+#SBATCH --cpus-per-task=16
+#SBATCH --mem-per-cpu=16g
+#SBATCH -o slurm_logs/%j_sensitivity-vggsound.out
+#SBATCH -e slurm_logs/%j_sensitivity-vggsound.err
+
+source env.sh
+: "${VARIANT:?set VARIANT=lambda|views|dual}"
+LAMBD="${LAMBD:-0.05}"
+K="${K:-2}"
+NGPU="${NGPU:-1}"
+EXTRA=""
+LR=3e-4
+case "$VARIANT" in
+  lambda|views) ;;
+  dual) EXTRA="--dual_encoder"; LR=5e-4 ;;
+  *) echo "unknown VARIANT=$VARIANT"; exit 2 ;;
+esac
+RUN="sensitivity-$VARIANT-lambd$LAMBD-k$K"
+
+srun python ../train.py \
+  --dataset vggsound \
+  --vit_size base \
+  --cross_modal \
+  --lr "$LR" \
+  --lambd "$LAMBD" \
+  --num_global_views 2 \
+  --num_local_views "$K" \
+  --batch_size 32 \
+  --num_gpus "$NGPU" \
+  --num_workers 9 \
+  --num_frames 16 \
+  --frame_size 224 \
+  --epochs 30 \
+  --proj_dim 128 \
+  --probe_lr 1e-3 \
+  --probe_weight_decay 0.0 \
+  --attentive_probe \
+  --ckpt_keep_last 1 \
+  --checkpoint_dir "$OUTPUT_ROOT/checkpoints/$RUN" \
+  --run_name "$RUN" \
+  $EXTRA
