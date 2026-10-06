@@ -1,11 +1,30 @@
-.em-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 18px; margin-bottom: 10px; }
-.em-modes { display: flex; gap: 6px; }
+#embedding-plot { display: grid; grid-template-columns: minmax(0, 520px) minmax(0, 1fr); grid-template-rows: auto 1fr; grid-template-areas: "stage side" "stage caption"; gap: 0 32px; align-items: start; }
+#embedding-plot .em-stage { grid-area: stage; }
+#embedding-plot .em-side { grid-area: side; }
+#embedding-plot figcaption { grid-area: caption; margin-top: 24px; }
+.em-side { display: flex; flex-direction: column; gap: 22px; padding-top: 4px; }
+.em-heading { font-size: 12px; font-weight: 700; letter-spacing: .02em; color: var(--ink-2); margin-bottom: 8px; }
+.em-modes { display: flex; flex-wrap: wrap; gap: 6px; }
 .em-modes button { font: inherit; font-size: 13px; padding: 4px 11px; border: 1px solid var(--line); border-radius: 999px; background: var(--bg); color: var(--ink-3); cursor: pointer; }
 .em-modes button[aria-pressed="true"] { border-color: var(--ink); color: var(--ink); }
 .em-modes button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.em-legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 13px; color: var(--ink-2); }
+.em-legend { display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: var(--ink-2); }
 .em-legend span { display: inline-flex; align-items: center; gap: 6px; }
 .em-legend i { width: 9px; height: 9px; border-radius: 50%; }
-.em-stage { position: relative; border: 1px solid var(--line); border-radius: var(--radius); }
-.em-stage canvas { display: block; width: 100%; aspect-ratio: 4 / 3; touch-action: manipulation; }
+.em-stage { position: relative; overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius); }
+.em-stage canvas.em-zoomed { touch-action: none; cursor: grab; }
+.em-stage canvas.em-zoomed:active { cursor: grabbing; }
+.em-zoom { position: absolute; top: 10px; right: 10px; display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; background: var(--bg); }
+.em-zoom button { width: 28px; height: 28px; padding: 0; border: 0; background: var(--bg); color: var(--ink-2); font: inherit; font-size: 16px; line-height: 1; cursor: pointer; }
+.em-zoom button + button { border-top: 1px solid var(--line); }
+.em-zoom button:hover:not(:disabled) { background: var(--bg-soft); color: var(--ink); }
+.em-zoom button:disabled { color: var(--ink-3); opacity: .5; cursor: default; }
+.em-zoom button:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.em-stage canvas { display: block; width: 100%; aspect-ratio: 1; touch-action: pan-y; }
 .em-tip { position: absolute; pointer-events: none; padding: 3px 8px; border-radius: 4px; background: var(--ink); color: var(--bg); font-size: 12px; white-space: nowrap; }
+@media (max-width: 640px) {
+  #embedding-plot { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; grid-template-areas: "side" "stage" "caption"; gap: 16px; }
+  #embedding-plot figcaption { margin-top: 0; }
+  .em-side { gap: 12px; }
+  .em-legend { flex-direction: row; flex-wrap: wrap; gap: 4px 14px; }
+}

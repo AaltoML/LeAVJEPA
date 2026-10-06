@@ -104,13 +104,7 @@
   a { color: var(--accent); text-decoration: none; }
   a:hover { text-decoration: underline; }
 
-  #abstract h2 {
-    text-align: center;
-    font-size: 15px;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    margin: 0 0 14px;
-  }
+  #abstract h2 { margin: 0 0 12px; }
   .abstract-box {
     background: var(--bg-soft);
     border: 1px solid var(--line);
@@ -286,7 +280,7 @@
   <p class="contact">Correspondence: <a href="mailto:benjamin.robson@aalto.fi">benjamin.robson@aalto.fi</a></p>
 
   <div class="links">
-    <a class="btn" href="https://arxiv.org/abs/XXXX.XXXXX">
+    <a class="btn" href="https://arxiv.org/abs/2610.06226">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>
       Paper
     </a>
@@ -417,7 +411,7 @@
   <section id="retrieval">
     <h2>Cross-modal retrieval</h2>
     <p>LeAVJEPA retrieves paired audio and video by cosine similarity of projected [CLS] features. The additional InfoNCE-head experiment trains a contrastive head on frozen features and is not zero-shot.</p>
-    <p class="paper-caption" id="retrieval-caption">AudioSet cross-modal retrieval on the CAV-MAE balanced evaluation subset (1,725 clips; 1,722 available for our evaluation), recall in percent. Baseline rows are as reported in the respective papers and all train an explicit cross-modal alignment term or predictor; LeAVJEPA rows are zero-shot cosine retrieval unless marked. Best baseline result per column in bold. <sup>†</sup>MJEPA retrieves through its jointly trained cross-modal predictor with an L1 nearest-neighbour search rather than direct embedding similarity. <sup>‡</sup>Contrastive alignment head trained on frozen features; not zero-shot.</p>
+    <p class="paper-caption" id="retrieval-caption">AudioSet cross-modal retrieval on the CAV-MAE balanced evaluation subset (1,725 clips), recall in percent. Baseline rows are as reported in the respective papers and all train an explicit cross-modal alignment term or predictor; LeAVJEPA rows are zero-shot cosine retrieval unless marked. Best baseline result per column in bold. <sup>†</sup>MJEPA retrieves through its jointly trained cross-modal predictor with an L1 nearest-neighbour search rather than direct embedding similarity. <sup>‡</sup>Contrastive alignment head trained on frozen features; not zero-shot.</p>
     <div class="table-scroll" tabindex="0" role="region" aria-labelledby="retrieval-caption">
       <table class="paper-table" data-result-table="retrieval" aria-labelledby="retrieval-caption">
         <thead><tr><th></th><th colspan="3" scope="colgroup">Audio → video</th><th colspan="3" scope="colgroup">Video → audio</th></tr><tr><th scope="col">Method</th><th scope="col" class="num">R@1</th><th scope="col" class="num">R@5</th><th scope="col" class="num">R@10</th><th scope="col" class="num">R@1</th><th scope="col" class="num">R@5</th><th scope="col" class="num">R@10</th></tr></thead>
@@ -479,7 +473,7 @@
     <p>Each point is a VGGSound clip, placed by its LeAVJEPA embedding and coloured by what the clip contains. Start with the joint audio-video points: instruments, animals, vehicles and water sounds form clean clusters, although the model never sees a label during training. Then switch on Audio or Video to see where the same clips land when the model gets only one modality.</p>
     <figure>
       <div id="embedding-plot"><p>Enable JavaScript to explore the embedding space.</p></div>
-      <figcaption><b>Embedding space of LeAVJEPA.</b> Click a point to link the audio-only, video-only and joint versions of that clip. Heavy-tailed t-SNE of frozen ViT-L embeddings for 1,474 test clips from 30 classes; nearby points are similar, but distances between groups carry no meaning.</figcaption>
+      <figcaption><b>Embedding space of LeAVJEPA.</b> Click a point to link the audio-only, video-only and joint versions of that clip. Pinch or Ctrl/&#8984;-scroll to zoom, and drag to pan. Heavy-tailed t-SNE of frozen ViT-L embeddings for 1,474 test clips from 30 classes; nearby points are similar, but distances between groups carry no meaning.</figcaption>
     </figure>
   </section>
 
