@@ -13,10 +13,14 @@
         script.src = example.data;
         script.onload = () => {
           script.remove();
-          const data = window.LEAV_ATTENTION_DATA[example.id];
-          const values = new Float32Array(Uint8Array.from(atob(data.video), (c) => c.charCodeAt(0)).buffer);
-          if (values.length !== data.frames * data.grid ** 2) reject(new Error("Incomplete attention data."));
-          else resolve({ data, values });
+          try {
+            const data = window.LEAV_ATTENTION_DATA[example.id];
+            const values = new Float32Array(Uint8Array.from(atob(data.video), (c) => c.charCodeAt(0)).buffer);
+            if (values.length !== data.frames * data.grid ** 2) throw new Error("Incomplete attention data.");
+            resolve({ data, values });
+          } catch {
+            reject(new Error("Attention data could not be loaded. Please reload the page."));
+          }
         };
         script.onerror = () => { script.remove(); reject(new Error("Attention data could not be loaded. Please reload the page.")); };
         document.head.append(script);
@@ -28,14 +32,15 @@
   function setup(root) {
     const get = (role) => root.querySelector(`[data-role="${role}"]`);
     const video = get("video"), canvas = get("map"), context = canvas.getContext("2d");
+    const playButton = get("play");
     const tile = document.createElement("canvas"), tileContext = tile.getContext("2d");
     const earlyLoop = navigator.vendor === "Apple Computer, Inc.";
-    let clip, weights, version = 0, frame = -1, ready = false, visible = false;
+    let clip, weights, version = 0, frame = -1, visible = false;
     let animationRequest = 0;
     video.muted = true;
 
     function draw(mediaTime = video.currentTime) {
-      if (!clip || !ready) return;
+      if (!clip) return;
       // Firefox's frame timestamps can keep increasing across native loops.
       const time = (mediaTime % clip.duration) + clip.sourceOffset;
       let next = 0;
@@ -60,12 +65,35 @@
       get("sound").setAttribute("aria-label", video.muted ? "Turn sound on" : "Turn sound off");
       get("sound").setAttribute("aria-pressed", String(!video.muted));
     }
+    function showReady() {
+      if (!clip) return;
+      root.setAttribute("aria-busy", "false");
+      get("status").textContent = !playButton.hidden ? "Tap Play to start the video."
+        : clip.nativeHW && Math.min(...clip.nativeHW) < 672
+          ? `Source footage: ${clip.nativeHW[1]} × ${clip.nativeHW[0]}.` : "";
+      draw();
+    }
+    function showVideoError() {
+      if (!clip) return;
+      root.setAttribute("aria-busy", "false");
+      playButton.hidden = true;
+      get("status").textContent = "This video could not be loaded. Please reload the page.";
+    }
     function start() {
-      if (ready && visible && !document.hidden) video.play().catch(() => {});
+      if (!clip || !visible || document.hidden) return;
+      const request = version;
+      // Mobile browsers may defer loadeddata until play() requests the first frame.
+      video.play().catch((error) => {
+        if (request !== version || !visible || document.hidden || error.name === "AbortError") return;
+        if (error.name === "NotAllowedError") {
+          playButton.hidden = false;
+          showReady();
+        } else showVideoError();
+      });
     }
     function updatePlayback() {
       animationRequest = 0;
-      if (!ready || video.paused || !visible || document.hidden) return;
+      if (!clip || video.paused || !visible || document.hidden) return;
       // Seek in the last half-frame to avoid Safari's end-of-stream restart stall.
       // Native looping remains the fallback if a busy/background tab misses this window.
       if (earlyLoop && video.loop && !video.seeking && Number.isFinite(video.duration)
@@ -88,7 +116,8 @@
       video.pause();
       video.removeAttribute("src");
       video.load();
-      clip = null; ready = false; frame = -1;
+      clip = null; frame = -1;
+      playButton.hidden = true;
       context.clearRect(0, 0, canvas.width, canvas.height);
       root.setAttribute("aria-busy", "true");
       get("status").textContent = `Loading ${example.label.toLowerCase()}…`;
@@ -101,37 +130,37 @@
         canvas.setAttribute("aria-label", `${example.label}: audio-to-video attention`);
         video.poster = example.poster;
         video.src = example.source;
+        playButton.setAttribute("aria-label", `Play ${example.label.toLowerCase()} video`);
+        // The map can render over the poster even before video decoding or autoplay.
+        showReady();
+        start();
       } catch (error) {
         if (request !== version) return;
         root.setAttribute("aria-busy", "false");
         get("status").textContent = error.message;
       }
     }
-    video.addEventListener("loadeddata", () => {
-      if (!clip) return;
-      ready = true;
-      root.setAttribute("aria-busy", "false");
-      get("status").textContent = clip.nativeHW && Math.min(...clip.nativeHW) < 672
-        ? `Source footage: ${clip.nativeHW[1]} × ${clip.nativeHW[0]}.` : "";
-      draw();
-      start();
+    for (const event of ["loadeddata", "canplay"]) video.addEventListener(event, showReady);
+    video.addEventListener("playing", () => {
+      playButton.hidden = true;
+      showReady();
+      trackPlayback();
     });
-    video.addEventListener("error", () => {
-      if (clip) get("status").textContent = "This video could not be loaded. Please reload the page.";
-    });
+    video.addEventListener("error", showVideoError);
     video.addEventListener("seeked", () => draw());
     video.addEventListener("volumechange", controls);
-    video.addEventListener("playing", trackPlayback);
     video.addEventListener("pause", stopTracking);
     video.addEventListener("emptied", stopTracking);
     if (video.requestVideoFrameCallback) {
       const update = (_, metadata) => { draw(metadata.mediaTime); video.requestVideoFrameCallback(update); };
       video.requestVideoFrameCallback(update);
     }
+    playButton.addEventListener("click", start);
     get("sound").addEventListener("click", () => {
       video.muted = !video.muted;
       if (!video.muted) for (const other of instances) if (other.video !== video) other.video.muted = true;
       controls();
+      start();
     });
     const reveal = () => get("stage").style.setProperty("--reveal", `${get("reveal").value}%`);
     get("reveal").addEventListener("input", reveal);
