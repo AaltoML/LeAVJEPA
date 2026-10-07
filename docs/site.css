@@ -255,7 +255,8 @@ pre.bibtex {
   .also { max-width: 280px; margin-inline: auto; }
   .btn { padding-inline: 16px; }
   #attention { margin-top: 32px; }
-  pre.bibtex { padding: 20px; padding-top: 56px; }
+  pre.bibtex { padding: 20px; }
+  .copy-btn { top: 10px; right: 10px; min-height: 28px; padding: 3px 10px; }
 }
 
 @media (max-width: 360px) {
