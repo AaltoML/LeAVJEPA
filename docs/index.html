@@ -23,6 +23,8 @@
 <script src="assets/attention/index.js" defer></script>
 <script src="attention.js" defer></script>
 <link rel="stylesheet" href="site.css">
+<link rel="stylesheet" href="comparison.css">
+<script src="comparison.js" defer></script>
 </head>
 <body>
 
@@ -108,6 +110,32 @@
 
   <section id="abstract">
     <div class="abstract-box"><h2>Abstract</h2><p>Prior audio-visual self-supervised learning methods rely on mechanisms such as EMA target encoders, prediction heads, reconstruction decoders, and contrastive losses. We introduce LeAVJEPA, the first audio-visual encoder trained under LeJEPA&#x27;s collapse-free objective. A single early-fusion Vision Transformer processes audio, video, and joint audio-video inputs. Modality dropout treats a missing modality as another view of the same event, making cross-modal alignment implicit in the objective. The model aligns global embeddings with modality-specific local embeddings, and SIGReg prevents representational collapse. A controlled ablation identifies modality dropout as the key mechanism for audio-visual alignment. Despite the architectural simplicity, LeAVJEPA reaches 36.0 mAP on AudioSet-20K and 91.3% accuracy on ESC-50 under frozen evaluation. After fine-tuning, it reaches 61.1% accuracy on VGGSound, and its embeddings support zero-shot audio-visual retrieval.</p></div>
+  </section>
+
+  <section id="comparison" aria-labelledby="comparison-heading">
+    <h2 id="comparison-heading">A simpler architecture</h2>
+    <figure class="comparison-figure">
+      <div id="leav-removals" role="group" aria-label="A simpler architecture for audio-visual learning">
+        <nav class="rm-nav" aria-label="Comparison stage">
+          <button type="button" class="rm-method" data-method="0" aria-pressed="false"><span class="rm-index" aria-hidden="true">01</span><span class="rm-label">Reconstruct<span> + contrast</span></span></button>
+          <button type="button" class="rm-method" data-method="1" aria-pressed="false"><span class="rm-index" aria-hidden="true">02</span>MJEPA</button>
+          <button type="button" class="rm-method" data-method="2" aria-pressed="true"><span class="rm-index" aria-hidden="true">03</span>LeAVJEPA</button>
+        </nav>
+        <div class="rm-control"><span class="rm-action" data-action aria-live="polite"></span><button class="rm-play" data-play type="button">Replay</button></div>
+        <div class="rm-canvas">
+          <svg role="img" aria-labelledby="rm-description">
+            <desc id="rm-description">Conceptual architecture comparison with a real guitar clip and its audio. In reconstruction, decoders recover masked input patches; the unmasked samples here illustrate reconstruction targets, not model predictions. Contrastive learning pulls the audio and video of the same clip together and pushes other clips, the negatives, apart. The decoders and negatives disappear. MJEPA predicts latent targets from an EMA teacher. The teacher and predictor then disappear. LeAVJEPA aligns audio, video, and joint views with one shared encoder, a projector, and invariance plus SIGReg.</desc>
+            <defs>
+              <marker id="rm-arrow" markerWidth="5" markerHeight="6" refX="4" refY="3" orient="auto" markerUnits="userSpaceOnUse"><path d="M.5,.5 L4,3 L.5,5.5" fill="none" stroke="#a2adba" stroke-width="1.2"/></marker>
+              <marker id="rm-blue-arrow" markerWidth="5" markerHeight="6" refX="4" refY="3" orient="auto" markerUnits="userSpaceOnUse"><path d="M.5,.5 L4,3 L.5,5.5" fill="none" stroke="#2859a0" stroke-width="1.2"/></marker>
+              <marker id="rm-red-arrow" markerWidth="5" markerHeight="6" refX="4" refY="3" orient="auto" markerUnits="userSpaceOnUse"><path d="M.5,.5 L4,3 L.5,5.5" fill="none" stroke="#98685d" stroke-width="1.2"/></marker>
+            </defs>
+            <g data-wires></g><g data-nodes></g>
+          </svg>
+        </div>
+        <span class="rm-sr" data-status aria-live="polite"></span>
+      </div>
+    </figure>
   </section>
 
   <section id="method">
