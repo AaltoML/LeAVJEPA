@@ -23,6 +23,13 @@
 .ma-canvas .ma-prominent { font-size: 15px; fill: var(--ink-2); }
 .ma-canvas .ma-cls-label { font-size: 13px; font-weight: 600; fill: var(--accent); }
 .ma-canvas .ma-block-label { font-size: 16px; }
+.ma-canvas .ma-loss-note { font-size: 13px; fill: var(--ink-2); }
+.ma-canvas .ma-loss-panel { rx: 6px; stroke: var(--line); stroke-width: 1; }
+.ma-canvas .ma-loss-label { font-size: 14px; font-weight: 500; fill: var(--ink); }
+.ma-canvas .ma-loss-detail { font-size: 13px; fill: var(--ink-3); }
+.ma-canvas .ma-bar-key { rx: 1px; }
+.ma-canvas .ma-point-name { font-size: 15px; font-weight: 500; }
+#ma-tubelets > g { filter: drop-shadow(0 0 1px white) drop-shadow(0 0 .5px white); }
 .ma-patch { transform: scale(var(--patch-x, 1), var(--patch-y, 1)); }
 #results tbody th, #retrieval tbody th { font-size: inherit; font-weight: 500; color: var(--ink); }
 #results .table-scroll + .table-scroll { margin-top: 36px; }
