@@ -250,6 +250,15 @@ pre.bibtex {
   h2 { font-size: 25px; }
   .abstract-box { padding: 20px 18px; }
   .abstract-box p { font-size: 15px; text-align: left; hyphens: none; }
+  figcaption, .method-figure figcaption, #embedding figcaption {
+    width: 100%;
+    max-width: none;
+    margin-inline: 0;
+    text-align: justify;
+    text-align-last: left;
+    text-wrap: wrap;
+    hyphens: auto;
+  }
   .paper-table th, .paper-table td { padding: 9px 10px; }
 }
 
