@@ -14,8 +14,6 @@ views under the LeJEPA objective, with SIGReg preventing representation collapse
 The release includes ViT-B and ViT-L pretraining, downstream fine-tuning, frozen
 attentive probes, and audio-video retrieval.
 
-This repository now contains the LeAVJEPA code. The earlier AV-JEPA workshop
-version is available in the [repository history](https://github.com/AaltoML/AV-JEPA/tree/3eefa234b841945b5f72111cba4c33aa3944df9f).
 The implementation retains the internal names `Echo`, `EchoTrainer`, and
 `EchoFineTuner` in `models.py` and the `echo` prefix in training logs and checkpoints.
 
